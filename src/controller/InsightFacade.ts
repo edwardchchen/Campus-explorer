@@ -6,11 +6,20 @@ import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError, NotFou
  *
  */
 export default class InsightFacade implements IInsightFacade {
+
 	constructor() {
 		console.trace("InsightFacadeImpl::init()");
 	}
 
 	public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
+		if (InsightDatasetKind.Courses) {
+			console.log("Courses");
+
+		} else if (InsightDatasetKind.Rooms) {
+			console.log("Rooms");
+		} else {
+			return Promise.reject("Invalid InsightDataSetKind");
+		}
 		return Promise.reject("Not implemented.");
 	}
 
