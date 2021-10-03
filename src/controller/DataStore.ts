@@ -3,45 +3,43 @@ import JSZip from "jszip";
 
 export default class DataStore{
 	// public dataSets: InsightDataset[]
+	private courses: Course[];
+	private dataMap: Map<number, Course[]> = new Map<number, Course[]>();
 
 
 	constructor() {
 		// this.dataSets = [];
 	}
-	private parseZip(results: JSZip) {
-		let zip = new JSZip();
-		let jsonArray: JSON[] = [];
-		Object.keys(results.files).forEach(function (filename) {
-			zip.files[filename].async("string")
-				.then(function (fileData) {
-					return jsonArray.push(JSON.parse(fileData));
-				});
-		});
-		return jsonArray;
-
-
+	private isValidJson(json: string): boolean {
+		try {
+			JSON.parse(json);
+		} catch (e) {
+			return false;
+		}
+		return true;
 	}
+
 	public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
 		if (InsightDatasetKind.Courses) {
 			let zip = new JSZip();
 			const promises: any[] = [];
-
-			// more files !
 			zip.loadAsync(content, {base64: true})
 				.then((r: JSZip) =>{
 					return r;
 				}).then((results: JSZip)=>{
-					let jsonArray: JSON[] = [];
 					Object.keys(results.files).forEach(function (filename) {
 						promises.push(zip.files[filename].async("string"));
 					});
-					Promise.all(promises).then(function (data) {
-						console.log(JSON.parse(data.toString()));
-						// let lduh = JSON.parse(data.toString());
-					// do something with data
+					Promise.all(promises).then((data) => {
+						let jsonArray: JSON[] = [];
+						data.forEach((value) => {
+							if(this.isValidJson(value)){
+								jsonArray.push(JSON.parse(value));
+							}
+						});
+						console.log(jsonArray);
+						return jsonArray;
 					});
-
-
 				});
 
 		} else {
