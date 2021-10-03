@@ -14,9 +14,9 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
-		this.dataStore.addDataset(id,content,kind);
-
-		return Promise.resolve(["LDUH."]);
+		return Promise.resolve(this.dataStore.addDataset(id, content, kind)).then((r) => {
+			return r;
+		});
 	}
 
 	public removeDataset(id: string): Promise<string> {

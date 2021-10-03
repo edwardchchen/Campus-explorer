@@ -5,8 +5,7 @@ import Course from "./Course";
 
 export default class DataStore{
 	// public dataSets: InsightDataset[]
-	private courses: Course[];
-	private dataMap: Map<number, Course[]> = new Map<number, Course[]>();
+	private dataMap: Map<string, Course[]> = new Map<string, Course[]>();
 
 
 	constructor() {
@@ -32,7 +31,7 @@ export default class DataStore{
 	}
 	private convertJsonCourseIntoCourse(course: any) {
 		if(this.isValidCourse(course)){
-			return new Course(course.Subject, course.Section, course.Avg, course.Professor, course.Title,
+			return new Course(course.Subject, course.Course, course.Avg, course.Professor, course.Title,
 				course.Pass, course.Fail, course.Audit, course.id, course.Year);
 		}
 		return null;
@@ -43,14 +42,14 @@ export default class DataStore{
 		if (InsightDatasetKind.Courses) {
 			let zip = new JSZip();
 			const promises: any[] = [];
-			zip.loadAsync(content, {base64: true})
+			return zip.loadAsync(content, {base64: true})
 				.then((r: JSZip) =>{
 					return r;
 				}).then((results: JSZip)=>{
 					Object.keys(results.files).forEach(function (filename) {
 						promises.push(zip.files[filename].async("string"));
 					});
-					Promise.all(promises).then((data) => {
+					return Promise.all(promises).then((data) => {
 						let jsonArray: Course[] = [];
 						data.forEach((value) => {
 							if(this.isValidJson(value) && JSON.parse(value).result.length > 0 ) {
@@ -63,15 +62,20 @@ export default class DataStore{
 								});
 							}
 						});
-						return jsonArray;
+						this.dataMap.set(id,jsonArray);
+						let existingKeys: string[] = [];
+						for (let key of this.dataMap.keys()) {
+							existingKeys.push(key);
+						}
+
+						return existingKeys;
 					});
-
+				}).then((res: any)=>{
+					return Promise.resolve(res);
 				});
-
 		} else {
 			return Promise.reject("Invalid InsightDataSetKind");
 		}
-		return Promise.resolve(["LDUH."]);
 
 	}
 }
