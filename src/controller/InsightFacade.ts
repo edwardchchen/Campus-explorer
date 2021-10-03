@@ -1,5 +1,5 @@
-import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError, NotFoundError} from "./IInsightFacade";
-import JSZip from "jszip";
+import {IInsightFacade, InsightDataset, InsightDatasetKind} from "./IInsightFacade";
+import DataStore from "./DataStore";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -7,20 +7,15 @@ import JSZip from "jszip";
  *
  */
 export default class InsightFacade implements IInsightFacade {
+	public dataStore: DataStore
 	constructor() {
 		console.trace("InsightFacadeImpl::init()");
+		this.dataStore = new DataStore();
 	}
 
 	public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
-		if (InsightDatasetKind.Courses) {
-			let zip = new JSZip();
-			// more files !
-			zip.loadAsync("UEsDBAoDAAAAAJxs8T...AAAAAA==", {base64: true})
-				.then((r) => console.log(r));
+		this.dataStore.addDataset(id,content,kind);
 
-		} else {
-			return Promise.reject("Invalid InsightDataSetKind");
-		}
 		return Promise.resolve(["LDUH."]);
 	}
 
