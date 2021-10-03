@@ -2,9 +2,14 @@
 
 export default class ValidateHelper {
 
+
+	private whereMathField: string[] = ["avg", "pass", "fail", "audit", "year"];
+	private whereStringField: string[] = ["dept", "id", "instructor", "title", "uuid"];
+	private queryID: string;
 	private result: boolean; // result for the validateAllQuery
 	constructor() {
 		this.result = true;
+		this.queryID = "";
 	}
 
 	public validateAllQuery (query: any): boolean {
@@ -123,11 +128,31 @@ export default class ValidateHelper {
 	}
 
 	public validateGT(filter: any): boolean {
-		return true;
+		if (!this.isQueryObject(filter)) {
+			return false;
+		} else if (Object.keys(filter).length < 1) { // if empty means invalid
+			return false;
+		} else if (Object.keys(filter).length !== 1 ) { // if more than length 1 means invalid
+			return false;
+		} else if (Object.values(filter)[0] === false ) { // how to make this work?
+			return false;
+		} else {
+			return this.validateNumberType(Object.keys(filter)[0]);
+		}
 	}
 
 	public validateEQ(filter: any): boolean {
-		return true;
+		if (!this.isQueryObject(filter)) {
+			return false;
+		} else if (Object.keys(filter).length < 1) { // if empty means invalid
+			return false;
+		} else if (Object.keys(filter).length !== 1 ) { // if more than length 1 means invalid
+			return false;
+		} else if (Object.values(filter)[0] === false ) { // how to make this work?
+			return false;
+		} else {
+			return this.validateNumberType(Object.keys(filter)[0]);
+		}
 	}
 
 	public validateAND(filter: any): boolean {
@@ -167,7 +192,19 @@ export default class ValidateHelper {
 	}
 
 	public validateIS(filter: any): boolean {
-		return true;
+		if (!this.isQueryObject(filter)) {
+			return false;
+		} else if (Object.keys(filter).length < 1) { // if empty means invalid
+			return false;
+		} else if (Object.keys(filter).length !== 1 ) { // if more than length 1 means invalid
+			return false;
+		} else if ((this.validateStringType(filter) === false)) {
+			return false;
+		} else if (Object.values(filter)[0] === false ) { // how to make this work?
+			return false;
+		} else {
+			return this.validateRegType(Object.values(filter)[0]);
+		}
 	}
 
 
@@ -186,8 +223,61 @@ export default class ValidateHelper {
 		}
 	}
 
-	public validateNumberType(filter: any): boolean {
+	public validateNumberType(filter: any): boolean { // need revision for formatting
+		if (!this.validateIDFormat(filter)) {
+			return false;
+		}
+		let array: string[];
+		array = filter.split("_");
+		if (!this.whereMathField.includes(filter)) {
+			return false;
+		}
+		return this.validateDataSetID(array[0]);
+	}
+
+	public validateIDFormat(filter: any): boolean { // need revision for formatting
+		if (!(typeof filter === "string")) {
+			return false;
+		}
+		let array: string[];
+		array = filter.split("_");
+		if (array.length !== 2) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	public validateDataSetID(id: string): boolean {
+		if (this.queryID === "") { // no ID has been verified against yet
+			this.queryID = id;
+		} else if (this.queryID !== "") { // an ID exist but has to match the same queryID
+			if (this.queryID !== id) {
+				this.result = false;
+				return false;
+			} else {
+				return true;
+			}
+		} else {
+			return true;
+		}
 		return true;
+	}
+
+	public validateStringType(filter: any): boolean {
+		if (this.validateIDFormat(filter) === false) {
+			return false;
+		}
+		let array: string[] = filter.split("_");
+		if (this.whereStringField.includes(filter)) {
+			return false;
+		} else {
+			return this.validateDataSetID(array[0]);
+		}
+	}
+
+	public validateRegType(regex: any): boolean {
+		let expression = /^(\*)(\*)?$/; // how to make this work?
+		return expression.test(regex);
 	}
 
 
@@ -195,3 +285,5 @@ export default class ValidateHelper {
 		return true;
 	}
 }
+
+// check if all IDs are the same first
