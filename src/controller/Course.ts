@@ -1,5 +1,5 @@
 
-class Course {
+export default class Course {
 	private dept: string;
 	private id: string;
 	private avg: number;
