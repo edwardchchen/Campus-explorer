@@ -20,7 +20,9 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public removeDataset(id: string): Promise<string> {
-		return Promise.reject("Not implemented.");
+		return Promise.resolve(this.dataStore.removeDataset(id)).then((r) => {
+			return r;
+		});
 	}
 
 	public performQuery(query: any): Promise<any[]> {
@@ -28,6 +30,8 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public listDatasets(): Promise<InsightDataset[]> {
-		return Promise.reject("Not implemented.");
+		return Promise.resolve(this.dataStore.listDatasets()).then((r) => {
+			return r;
+		});
 	}
 }

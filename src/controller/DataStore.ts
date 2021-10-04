@@ -1,15 +1,15 @@
-import {InsightDatasetKind} from "./IInsightFacade";
+import {InsightDataset, InsightDatasetKind, NotFoundError} from "./IInsightFacade";
 import JSZip from "jszip";
 import Course from "./Course";
 
 
 export default class DataStore{
-	// public dataSets: InsightDataset[]
+	public dataSets: InsightDataset[]
 	private dataMap: Map<string, Course[]> = new Map<string, Course[]>();
 
 
 	constructor() {
-		// this.dataSets = [];
+		this.dataSets = [];
 	}
 	private isValidJson(json: string): boolean {
 		try {
@@ -63,11 +63,11 @@ export default class DataStore{
 							}
 						});
 						this.dataMap.set(id,jsonArray);
+						this.dataSets.push({id:id,kind:kind,numRows:jsonArray.length});
 						let existingKeys: string[] = [];
 						for (let key of this.dataMap.keys()) {
 							existingKeys.push(key);
 						}
-
 						return existingKeys;
 					});
 				}).then((res: any)=>{
@@ -78,4 +78,20 @@ export default class DataStore{
 		}
 
 	}
+	public removeDataset(id: string): Promise<string> {
+		for(let  i = 0;i < this.dataSets.length;i++){
+			if(this.dataSets[i].id === id){
+				delete this.dataSets[i];
+			}
+		}
+		if(this.dataMap.delete(id)){
+			return Promise.resolve(id);
+		}
+		return Promise.reject(new NotFoundError());
+	}
+
+	public listDatasets(): Promise<InsightDataset[]> {
+		return Promise.resolve(this.dataSets);
+	}
+
 }
