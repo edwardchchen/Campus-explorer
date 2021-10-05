@@ -4,17 +4,30 @@ import ValidateHelper from "./ValidateHelper";
 export default class QueryEngine {
 
 	private validateHelper: ValidateHelper;
-	private dataSets: any;
+	private tempDataSets: any;
 	constructor() {
 		this.validateHelper = new ValidateHelper();
 	}
 	public runQuery(query: any, dataSet: any[]): Promise<any[]>{ // return the list of InsightFacade
 		return new Promise<any[]>((resolve, reject) => { // resolve goes to the then block,
 			this.queryValidate(query).then(() => {
+				this.tempDataSets = dataSet;
+				let id: string;
+				id = this.validateHelper.findID();
+				// if (id === "") {
+				// 	reject("id shouldn't be empty");
+				// } else {
+				// 	if (this.validateIDwithDataSet(id)) {
+				// 		resolve(this.queryExecute(id, this.dataSets));
+				// 	} else {
+				// 		reject("id doesn't exist in dataSets");
+				// 	}
+				// }
+
 				// get ID from the query and retrieve that ID from the dataset
 				// var id = query.getID;
 				// return this.queryExecute(query, dataSet); // execute query based on the ID of the query
-			});
+			}).catch();
 
 		}); // call queryValidate and then queryExecute, might want to make them different ts classes
 	}
@@ -38,6 +51,10 @@ export default class QueryEngine {
 		// validate OPTION
 		// validate if it can be successfully transformed into InsightFacade list
 	}
+
+	// public validateIDwithDataSet(id: string): boolean {
+	//
+	// }
 
 	// private queryExecute {
 	//
