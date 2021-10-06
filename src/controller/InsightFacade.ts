@@ -1,8 +1,7 @@
 import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError, NotFoundError} from "./IInsightFacade";
 import QueryEngine from "./QueryEngine";
-import * as fs from "fs-extra";
-import * as JSZip from "jszip";
 
+import DataStore from "./DataStore";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -11,24 +10,29 @@ import * as JSZip from "jszip";
  */
 export default class InsightFacade implements IInsightFacade {
 
-	public dataSets: any[]; // Assume that this is the list of sections in the database after add Dataset
 	// Question: is this how we can store dataSets after addDataset?
 	public qe: QueryEngine;
+	public dataStore: DataStore
 
 
 	constructor() {
 		console.trace("InsightFacadeImpl::init()");
-		this.dataSets = [];
 		this.qe = new QueryEngine();
+    this.dataStore = new DataStore();
+
 
 	}
 
 	public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
-		return Promise.reject("Not implemented.");
+		return Promise.resolve(this.dataStore.addDataset(id, content, kind)).then((r) => {
+			return r;
+		});
 	}
 
 	public removeDataset(id: string): Promise<string> {
-		return Promise.reject("Not implemented.");
+		return Promise.resolve(this.dataStore.removeDataset(id)).then((r) => {
+			return r;
+		});
 	}
 
 
@@ -50,6 +54,8 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public listDatasets(): Promise<InsightDataset[]> {
-		return Promise.reject("Not implemented.");
+		return Promise.resolve(this.dataStore.listDatasets()).then((r) => {
+			return r;
+		});
 	}
 }
