@@ -16,7 +16,7 @@ export default class ValidateHelper {
 		return this.queryID;
 	}
 	public validateAllQuery (query: any): boolean {
-		if (this.isQueryObject (query) === false) {
+		if (this.isQueryObject (query) === false) { // check if the object is undefined or null
 			this.result = false;
 		} else if (Object.keys(query).length < 1) { // meaning the object is empty
 			return false;
@@ -24,35 +24,35 @@ export default class ValidateHelper {
 		if (this.hasValidFields (query) === false) { // has correct length of 1 and has WHERE and OPTION fields
 			this.result = false;
 		}
-		if (this.validateWhereField(query["WHERE"]) === false) {
+		if (this.validateWhereField(query["WHERE"]) === false) { // goes to check WHERE field
 			this.result = false;
 		}
-		if (this.validateOptionsField(query["OPTIONS"]) === false) { // is this valid format?
+		if (this.validateOptionsField(query["OPTIONS"]) === false) { // goes to check OPTIONS field
 			this.result = false;
-		} return this.result;
+		} return this.result; // result should be true by default unless set to false by one of the above reasons
 	}
 	public hasValidFields (query: any): boolean {
-		if (this.hasCorrectLength(query) === false) {
+		if (this.hasCorrectLength(query) === false) { // check if the length of root level field = 2
 			return false;
-		} if (this.hasCorrectRootFields(query) === false) {
+		} if (this.hasCorrectRootFields(query) === false) { // check if the fields are WHERE and OPTIONS respectively
 			return false;
 		} return true;
 	}
-	public hasCorrectRootFields (query: any): boolean {
+	public hasCorrectRootFields (query: any): boolean { // check if the fields are WHERE and OPTIONS respectively
 		if (Object.keys(query)[0] !== "WHERE" || Object.keys(query)[1] !== "OPTIONS") {
 			return false;
 		} else {
 			return true;
 		}
 	}
-	public hasCorrectLength (query: any): boolean {
+	public hasCorrectLength (query: any): boolean { // check if length is equaled to 2, since WHERE + OPTION = 2
 		if (Object.keys(query).length !== 2) {
 			return false;
 		} else {
 			return true;
 		}
 	}
-	public isQueryObject(object: any): boolean {
+	public isQueryObject(object: any): boolean { // check if the query is a valid object
 		if (typeof object !== "object") { // should be an object
 			return false;
 		} else if (object.isArray()) { // should be a json object
@@ -65,7 +65,7 @@ export default class ValidateHelper {
 			return true;
 		}
 	}
-	public validateWhereField(where: any): boolean {
+	public validateWhereField(where: any): boolean { // validate WHERE field with helper functions
 		if (this.isQueryObject(where) === false) { // return false if the format of the inner query is wrong
 			return false;
 		} else if (Object.keys(where).length < 1) { // if WHERE is empty should be ok and return true and no filter
@@ -74,17 +74,17 @@ export default class ValidateHelper {
 			return this.validateFirstWhereFilters(where); // goes here only if there is something within the WHERE clause
 		}
 	}
-	public validateFirstWhereFilters(where: any): boolean { // cannot be an invalid object type
+	public validateFirstWhereFilters(where: any): boolean { // check the first key within the WHERE clause, should only have length 1
 		let listFilter: string[] = ["LT", "GT", "EQ", "AND", "OR", "NOT", "IS"];
 		if (!(Object.keys(where).length === 1)) {
 			return false;
-		} else if (!listFilter.includes(Object.keys(where)[0])) { // if the filter isn't one of the valid filters
+		} else if (!listFilter.includes(Object.keys(where)[0])) { // if the filter isn't one of the valid filters return false
 			return false;
 		} else {
-			return this.validateInnerFilter(where); // check inner filter
+			return this.validateInnerFilter(where); // else check inner filter
 		}
 	}
-	public validateInnerFilter(where: any): boolean {
+	public validateInnerFilter(where: any): boolean { // check each possible filter
 		let filter: string = Object.keys(where)[0];
 		if (filter === "LT" || filter === "GT" || filter === "EQ") {
 			return this.validateLTGTEQ(Object.values(where)[0]);
@@ -100,19 +100,19 @@ export default class ValidateHelper {
 			return false; // shouldn't reach here because where should be one of the filter types
 		}
 	}
-	public validateLTGTEQ(filter: any): boolean {
-		if (!this.isQueryObject(filter)) {
+	public validateLTGTEQ(filter: any): boolean { // the procedure for checking LT, GT, and EQ is the same
+		if (!this.isQueryObject(filter)) { // check if it is a valid object
 			return false;
-		} else if (Object.keys(filter).length !== 1 ) { // if more than length 1 means invalid
+		} else if (Object.keys(filter).length !== 1 ) { // if length of the key isn't 1 then it is invalid
 			return false;
-		} else if (typeof Object.values(filter)[0] !== "number") { // if the type isn't number return false
+		} else if (typeof Object.values(filter)[0] !== "number") { // if the type of its value isn't a number then invalid
 			return false;
 		} else {
-			return this.validateNumberType(Object.keys(filter)[0]);
+			return this.validateNumberType(Object.keys(filter)[0]); // validate if the key for example courses_avg is valid
 		}
 	}
-	public validateAND(filter: any): boolean {
-		if (!(filter.isArray())) {
+	public validateAND(filter: any): boolean { // validate AND, goes to recurrsion since the body after AND will have length 1 or more
+		if (!(filter.isArray())) { // needs to be an array otherwise false
 			return false;
 		} else if (filter.length < 1) {
 			return false;

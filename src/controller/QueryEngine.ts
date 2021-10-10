@@ -20,7 +20,7 @@ export default class QueryEngine {
 				if (id === "") {
 					reject("id shouldn't be empty");
 				} else {
-					if (this.validateIDwithDataSet(id)) {
+					if (this.validateIDwithDataSet(id)) { // validating if the dataset exists with specified ID
 						resolve (this.queryExecute(id, this.tempDataSets.get(id), query)); // not sure if the resolve works?
 					} else {
 						reject("id doesn't exist in dataSets");

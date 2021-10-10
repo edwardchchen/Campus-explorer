@@ -20,12 +20,12 @@ export default class ExecuteHelper {
 	}
 
 	public columnsNotIncluded(): void { // output a list of columns that should be removed in Course due to OPTIONS not specifying them
-		this.columnRequiredToBeRemoved = this.allFields.filter((x) => !this.validateHelper.columnField.includes(x) );
+		this.columnRequiredToBeRemoved = this.allFields.filter((x) => !this.validateHelper.columnField.includes(x));
 	}
 
 
-	public executeAndOrder (id: string, dataSet: Icourse[], validateHelper: ValidateHelper, query: any): Promise<any>{ // return a filtered list of courses
-		// first filter list
+	public executeAndOrder(id: string, dataSet: Icourse[], validateHelper: ValidateHelper, query: any): Promise<any> { // return a filtered list of courses
+		// first filter list and then if it is more than 5000 in length reject, otherwise
 		// second if there is order then order by specified column
 		this.id = id;
 		this.validateHelper = validateHelper;
@@ -39,17 +39,17 @@ export default class ExecuteHelper {
 					reject(new ResultTooLargeError(this.verifiedDataset.length));
 				}
 				if (this.validateHelper.requiresOrder) {
-					resolve (this.orderSort());
+					resolve(this.orderSort());
 				} else {
 					resolve(this.verifiedDataset);
 				}
 
-			}).catch(reject ("shouldn't reach here"));
+			}).catch(reject("shouldn't reach here"));
 
 		});
 	}
 
-  // listOfCourses: Course
+	// listOfCourses: Course
 	// eslint-disable-next-line max-lines-per-function
 	private filterEachCourse(queryField: any, curDataSet: Course[]): Course[] {
 		let where: any = queryField.WHERE;
@@ -60,19 +60,24 @@ export default class ExecuteHelper {
 		let array: string[] = IDAndattribute.split("_");
 		let attribute: string = array[1]; // avg
 		let filteredListCourses: Course[] = [];
-		if (key === "AND") { // probably need a promise here
-			let filteredDataset1 = this.filterEachCourse(Object.values(where)[0], curDataSet); // this goes first
-			let finalFilteredDataset = this.filterEachCourse(Object.values(where)[1], filteredDataset1); // this goes next
+		if (key === "AND") { // it was verified that the length is at least 1
+			let finalFilteredDataset: Course [] = curDataSet;
+			for (let keys of queryField) {
+				finalFilteredDataset = this.filterEachCourse(keys, finalFilteredDataset);
+			}
 			return finalFilteredDataset;
 		} else if (key === "OR") {
-			let filteredDataset1 = this.filterEachCourse(Object.values(where)[0], curDataSet);
-			let filteredDataset2 = this.filterEachCourse(Object.values(where)[1], curDataSet);
-			let combinedDataset = filteredDataset1.concat(filteredDataset2); // need to make unique also
+			let combinedDataset: Course[] = [];
+			for (let keys of queryField) {
+				let tempDataset = this.filterEachCourse(keys, curDataSet);
+				combinedDataset = [...tempDataset, ...combinedDataset]; // destructuring and combining without duplicate
+				// https://stackoverflow.com/questions/1584370/how-to-merge-two-arrays-in-javascript-and-de-duplicate-items
+			}
 			return combinedDataset;
 		} else if (key === "NOT") {
 			let listRequiredToNotBeIncluded = this.filterEachCourse(Object.values(where)[0], curDataSet);
 			let filteredArray: Course[];
-			filteredArray = this.verifiedDataset.filter((x) => !listRequiredToNotBeIncluded.includes(x) );
+			filteredArray = this.verifiedDataset.filter((x) => !listRequiredToNotBeIncluded.includes(x));
 			return filteredArray;
 		} else if (key === "IS") {
 			let str: string = Object.values(InnerLTStatement)[0] as string;
@@ -83,7 +88,8 @@ export default class ExecuteHelper {
 					this.deleteField(copiedSingleCourse); // make sure it is the copied course
 					filteredListCourses.push(copiedSingleCourse);
 				}
-			} return filteredListCourses;
+			}
+			return filteredListCourses;
 		} else if (key === "EQ") {
 			for (let singleCourse of this.verifiedDataset) {
 				if (singleCourse[attribute] === num) {
@@ -91,7 +97,8 @@ export default class ExecuteHelper {
 					this.deleteField(copiedSingleCourse); // make sure it is the copied course
 					filteredListCourses.push(copiedSingleCourse);
 				}
-			} return filteredListCourses;
+			}
+			return filteredListCourses;
 		} else if (key === "GT") {
 			for (let singleCourse of this.verifiedDataset) {
 				if (singleCourse[attribute] > num) {
@@ -99,7 +106,8 @@ export default class ExecuteHelper {
 					this.deleteField(copiedSingleCourse);
 					filteredListCourses.push(copiedSingleCourse);
 				}
-			} return filteredListCourses;
+			}
+			return filteredListCourses;
 		} else if (key === "LT") {
 			for (let singleCourse of this.verifiedDataset) {
 				if (singleCourse[attribute] < num) {
@@ -107,7 +115,8 @@ export default class ExecuteHelper {
 					this.deleteField(copiedSingleCourse); // make sure it is the copied course
 					filteredListCourses.push(copiedSingleCourse);
 				}
-			} return filteredListCourses;
+			}
+			return filteredListCourses;
 		} else {
 			return this.filteredListofCourses; // should actually just return error, should change it later
 		}
@@ -130,4 +139,16 @@ export default class ExecuteHelper {
 		}
 	}
 
+	private arrayUnique(array: Course[]) { // function taken from https://stackoverflow.com/questions/1584370/how-to-merge-two-arrays-in-javascript-and-de-duplicate-items
+		let a = array.concat();
+		for (let i = 0; i < a.length; ++i) {
+			for (let j = i + 1; j < a.length; ++j) {
+				if (a[i] === a[j]) {
+					a.splice(j--, 1);
+				}
+			}
+
+			return a;
+		}
+	}
 }
