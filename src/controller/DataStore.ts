@@ -1,11 +1,11 @@
 import {InsightDataset, InsightDatasetKind, InsightError, NotFoundError} from "./IInsightFacade";
 import JSZip from "jszip";
-import Course from "./Course";
+import Course from "./Icourse";
 
 
 export default class DataStore{
 	public dataSets: InsightDataset[]
-	private dataMap: Map<string, Course[]> = new Map<string, Course[]>();
+	public dataMap: Map<string, Course[]> = new Map<string, Course[]>();
 
 
 	constructor() {
