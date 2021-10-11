@@ -17,7 +17,9 @@ export default class DataStore{
 		} catch (e) {
 			return false;
 		}
-		return true;
+		return JSON.parse(json).result.length > 0;
+
+
 	}
 
 	private static isValidCourse(course: any): boolean {
@@ -80,7 +82,7 @@ export default class DataStore{
 				return Promise.all(promises).then((data) => {
 					let jsonArray: Course[] = [];
 					data.forEach((value) => {
-						if(DataStore.isValidJson(value) && JSON.parse(value).result.length > 0 ) {
+						if(DataStore.isValidJson(value)) {
 							let courseArray = JSON.parse(value).result;
 							courseArray.forEach((course: any) => {
 								let parsed = DataStore.convertJsonCourseIntoCourse(course);
@@ -90,6 +92,9 @@ export default class DataStore{
 							});
 						}
 					});
+					if(jsonArray.length === 0){
+						return Promise.reject(new InsightError());
+					}
 					this.dataMap.set(id,jsonArray);
 					this.dataSets.push({id:id,kind:kind,numRows:jsonArray.length});
 					let existingKeys: string[] = [];
@@ -98,6 +103,8 @@ export default class DataStore{
 					}
 					return existingKeys;
 				});
+			}).catch((e)=>{
+				return Promise.reject(new InsightError());
 			}).then((res: any)=>{
 				return Promise.resolve(res);
 			});
