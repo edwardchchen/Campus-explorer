@@ -1,6 +1,6 @@
 import {InsightDataset, InsightDatasetKind, InsightError, NotFoundError} from "./IInsightFacade";
 import JSZip from "jszip";
-import Course from "./Icourse";
+import {Course} from "./Course";
 
 
 export default class DataStore{
@@ -29,9 +29,21 @@ export default class DataStore{
 	}
 	private static convertJsonCourseIntoCourse(course: any) {
 		if(DataStore.isValidCourse(course)){
-			return new Course(course.Subject, course.Course, course.Avg, course.Professor, course.Title,
-				course.Pass, course.Fail, course.Audit, course.id, course.Year);
+			const c: Course = {
+				dept: course.Subject, // changed them to public instead of private, but you can add helper function later instead
+				id: course.Course,
+				avg: course.Avg,
+				instructor: course.Professor,
+				title: course.Title,
+				pass: course.Pass,
+				fail: course.Fail,
+				audit: course.Audit,
+				uuid: course.id,
+				year: course.Year,
+			};
+			return c;
 		}
+
 		return null;
 
 	}
@@ -91,6 +103,9 @@ export default class DataStore{
 			});
 	}
 	public removeDataset(id: string): Promise<string> {
+		if(DataStore.isIdInvalid(id)){
+			return Promise.reject(new InsightError("Invalid Id"));
+		}
 		for(let  i = 0;i < this.dataSets.length;i++){
 			if(this.dataSets[i].id === id){
 				delete this.dataSets[i];

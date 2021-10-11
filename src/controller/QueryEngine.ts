@@ -38,7 +38,7 @@ export default class QueryEngine {
 
 	private queryValidate(query: any): Promise<void> {
 		return new Promise<void>((resolve, reject) => {
-			if (this.validateHelper.validateAllQuery(query) === true) {
+			if (this.validateHelper.validateAllQuery(query)) {
 				//
 				resolve();
 			} else {
