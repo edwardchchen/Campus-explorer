@@ -79,30 +79,32 @@ export default class DataStore{
 				Object.keys(results.files).forEach(function (filename) {
 					promises.push(zip.files[filename].async("string"));
 				});
-				return Promise.all(promises).then((data) => {
-					let jsonArray: Course[] = [];
-					data.forEach((value) => {
-						if(DataStore.isValidJson(value)) {
-							let courseArray = JSON.parse(value).result;
-							courseArray.forEach((course: any) => {
-								let parsed = DataStore.convertJsonCourseIntoCourse(course);
-								if(parsed !== null){
-									jsonArray.push(parsed);
-								}
-							});
+				return Promise.all(promises)
+					.then((data) => {
+						let jsonArray: Course[] = [];
+						data.forEach((value) => {
+
+							if(DataStore.isValidJson(value)) {
+								let courseArray = JSON.parse(value).result;
+								courseArray.forEach((course: any) => {
+									let parsed = DataStore.convertJsonCourseIntoCourse(course);
+									if(parsed !== null){
+										jsonArray.push(parsed);
+									}
+								});
+							}
+						});
+						if(jsonArray.length === 0){
+							return Promise.reject(new InsightError());
 						}
+						this.dataMap.set(id,jsonArray);
+						this.dataSets.push({id:id,kind:kind,numRows:jsonArray.length});
+						let existingKeys: string[] = [];
+						this.dataSets.forEach(function(val){
+							existingKeys.push(val.id);
+						});
+						return existingKeys;
 					});
-					if(jsonArray.length === 0){
-						return Promise.reject(new InsightError());
-					}
-					this.dataMap.set(id,jsonArray);
-					this.dataSets.push({id:id,kind:kind,numRows:jsonArray.length});
-					let existingKeys: string[] = [];
-					for (let key of this.dataMap.keys()) {
-						existingKeys.push(key);
-					}
-					return existingKeys;
-				});
 			}).catch((e)=>{
 				return Promise.reject(new InsightError());
 			}).then((res: any)=>{
@@ -113,9 +115,13 @@ export default class DataStore{
 		if(DataStore.isIdInvalid(id)){
 			return Promise.reject(new InsightError("Invalid Id"));
 		}
+		if(!this.dataMap.get(id)){
+			return Promise.reject(new NotFoundError());
+		}
 		for(let  i = 0;i < this.dataSets.length;i++){
 			if(this.dataSets[i].id === id){
 				delete this.dataSets[i];
+				this.dataSets.splice(i, 1);
 			}
 		}
 		if(this.dataMap.delete(id)){
