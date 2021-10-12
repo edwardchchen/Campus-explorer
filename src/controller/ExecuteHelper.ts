@@ -56,8 +56,8 @@ export default class ExecuteHelper {
 		let key: string = Object.keys(where)[0];
 		let InnerLTStatement: any = Object.values(where)[0]; // example: "courses_avg": 92
 		let num: number = Object.values(InnerLTStatement)[0] as number; // this would be 92
-		let IDAndattribute = Object.keys(InnerLTStatement)[0]; // this would be "courses_avg"
-		let array: string[] = IDAndattribute.split("_");
+		let IDAndAttribute = Object.keys(InnerLTStatement)[0]; // this would be "courses_avg"
+		let array: string[] = IDAndAttribute.split("_");
 		let attribute: string = array[1]; // avg
 		let filteredListCourses: Course[] = [];
 		if (key === "AND") { // it was verified that the length is at least 1
@@ -131,12 +131,19 @@ export default class ExecuteHelper {
 
 	private orderSort(): Course[] { // sorts the Course[] based on if it is comparing num or string
 		if (this.whereMathField.includes(this.validateHelper.orderBy)) {
-			return this.filteredListofCourses; // filler output you should change it
+			// sort in ascending order
+			this.filteredListofCourses.sort((a, b) =>{
+				return a[this.validateHelper.orderBy] - b[this.validateHelper.orderBy];
+			});
+			return this.filteredListofCourses;
 		} else if (this.whereStringField.includes(this.validateHelper.orderBy)) {
-			return this.filteredListofCourses; // filler output you should change it
-		} else {
-			return this.filteredListofCourses; // shouldn't reach here, should report an error actually
+			// sort by a-z
+			this.filteredListofCourses.sort((a, b) =>{
+				return a[this.validateHelper.orderBy].localeCompare(b[this.validateHelper.orderBy]);
+			});
+			return this.filteredListofCourses;
 		}
+		return this.filteredListofCourses;
 	}
 
 	private arrayUnique(array: Course[]) { // function taken from https://stackoverflow.com/questions/1584370/how-to-merge-two-arrays-in-javascript-and-de-duplicate-items
