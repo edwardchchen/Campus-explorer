@@ -44,7 +44,9 @@ export default class ExecuteHelper {
 					resolve(this.verifiedDataset);
 				}
 
-			}).catch(reject("shouldn't reach here"));
+			}).catch(()=>{
+				reject(new InsightError("Should not reached here"));
+			});
 
 		});
 	}
