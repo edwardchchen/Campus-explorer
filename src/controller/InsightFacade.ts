@@ -18,7 +18,7 @@ export default class InsightFacade implements IInsightFacade {
 	constructor() {
 		console.trace("InsightFacadeImpl::init()");
 		this.qe = new QueryEngine();
-    this.dataStore = new DataStore();
+		this.dataStore = new DataStore();
 
 
 	}
@@ -50,7 +50,7 @@ export default class InsightFacade implements IInsightFacade {
 
 	public performQuery(query: any): Promise<any[]> { // shouldn't I return InsightDataset?
 		// Should I do a JSON.Parse? Or just Object.Keys(query), what is query really?
-		return this.qe.runQuery(query, this.dataSets); // should I take in a Dataset object as parameter as well? Otherwise how can I have the file for fillter?
+		return this.qe.runQuery(query, this.dataStore.dataMap); // should I take in a Dataset object as parameter as well? Otherwise how can I have the file for fillter?
 	}
 
 	public listDatasets(): Promise<InsightDataset[]> {
