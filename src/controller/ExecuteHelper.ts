@@ -27,28 +27,27 @@ export default class ExecuteHelper {
 	public executeAndOrder(id: string, dataSet: Icourse[], validateHelper: ValidateHelper, query: any): Promise<any> { // return a filtered list of courses
 		// first filter list and then if it is more than 5000 in length reject, otherwise
 		// second if there is order then order by specified column
-		this.id = id;
-		this.validateHelper = validateHelper;
-		this.columnsNotIncluded();
-		return new Promise<any[]>((resolve, reject) => {
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			// the .then doesn't work somehow, need to change later
-			(this.verifiedDataset = this.filterEachCourse(query, dataSet)).then(() => {
-				if (this.verifiedDataset.length > 5000) {
-					reject(new ResultTooLargeError(this.verifiedDataset.length));
-				}
-				if (this.validateHelper.requiresOrder) {
-					resolve(this.orderSort());
-				} else {
-					resolve(this.verifiedDataset);
-				}
-
-			}).catch(()=>{
-				reject(new InsightError("Should not reached here"));
-			});
-
-		});
+		// this.id = id;
+		// this.validateHelper = validateHelper;
+		// this.columnsNotIncluded();
+		// return new Promise<any[]>((resolve, reject) => {
+		// 	// the .then doesn't work somehow, need to change later
+		// 	(this.verifiedDataset = this.filterEachCourse(query, dataSet)).then(() => {
+		// 		if (this.verifiedDataset.length > 5000) {
+		// 			reject(new ResultTooLargeError(this.verifiedDataset.length));
+		// 		}
+		// 		if (this.validateHelper.requiresOrder) {
+		// 			resolve(this.orderSort());
+		// 		} else {
+		// 			resolve(this.verifiedDataset);
+		// 		}
+		//
+		// 	}).catch(()=>{
+		// 		reject(new InsightError("Should not reached here"));
+		// 	});
+		//
+		// });
+		return Promise.resolve();
 	}
 
 	// listOfCourses: Course
