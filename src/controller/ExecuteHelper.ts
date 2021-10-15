@@ -51,77 +51,76 @@ export default class ExecuteHelper {
 	}
 
 	// listOfCourses: Course
-	// eslint-disable-next-line max-lines-per-function
-	private filterEachCourse(queryField: any, curDataSet: Course[]): Course[] {
-		let where: any = queryField.WHERE;
-		let key: string = Object.keys(where)[0];
-		let InnerLTStatement: any = Object.values(where)[0]; // example: "courses_avg": 92
-		let num: number = Object.values(InnerLTStatement)[0] as number; // this would be 92
-		let IDAndAttribute = Object.keys(InnerLTStatement)[0]; // this would be "courses_avg"
-		let array: string[] = IDAndAttribute.split("_");
-		let attribute: string = array[1]; // avg
-		let filteredListCourses: Course[] = [];
-		if (key === "AND") { // it was verified that the length is at least 1
-			let finalFilteredDataset: Course [] = curDataSet;
-			for (let keys of queryField) {
-				finalFilteredDataset = this.filterEachCourse(keys, finalFilteredDataset);
-			}
-			return finalFilteredDataset;
-		} else if (key === "OR") {
-			let combinedDataset: Course[] = [];
-			for (let keys of queryField) {
-				let tempDataset = this.filterEachCourse(keys, curDataSet);
-				combinedDataset = [...tempDataset, ...combinedDataset]; // destructuring and combining without duplicate
-				// https://stackoverflow.com/questions/1584370/how-to-merge-two-arrays-in-javascript-and-de-duplicate-items
-			}
-			return combinedDataset;
-		} else if (key === "NOT") {
-			let listRequiredToNotBeIncluded = this.filterEachCourse(Object.values(where)[0], curDataSet);
-			let filteredArray: Course[];
-			filteredArray = this.verifiedDataset.filter((x) => !listRequiredToNotBeIncluded.includes(x));
-			return filteredArray;
-		} else if (key === "IS") {
-			let str: string = Object.values(InnerLTStatement)[0] as string;
-			let Strattribute: string = array[1]; // avg
-			for (let singleCourse of this.verifiedDataset) {
-				if (singleCourse[Strattribute] === str) {
-					let copiedSingleCourse: Course = singleCourse;
-					this.deleteField(copiedSingleCourse); // make sure it is the copied course
-					filteredListCourses.push(copiedSingleCourse);
-				}
-			}
-			return filteredListCourses;
-		} else if (key === "EQ") {
-			for (let singleCourse of this.verifiedDataset) {
-				if (singleCourse[attribute] === num) {
-					let copiedSingleCourse: Course = singleCourse;
-					this.deleteField(copiedSingleCourse); // make sure it is the copied course
-					filteredListCourses.push(copiedSingleCourse);
-				}
-			}
-			return filteredListCourses;
-		} else if (key === "GT") {
-			for (let singleCourse of this.verifiedDataset) {
-				if (singleCourse[attribute] > num) {
-					let copiedSingleCourse: Course = singleCourse;
-					this.deleteField(copiedSingleCourse);
-					filteredListCourses.push(copiedSingleCourse);
-				}
-			}
-			return filteredListCourses;
-		} else if (key === "LT") {
-			for (let singleCourse of this.verifiedDataset) {
-				if (singleCourse[attribute] < num) {
-					let copiedSingleCourse: Course = singleCourse;
-					this.deleteField(copiedSingleCourse); // make sure it is the copied course
-					filteredListCourses.push(copiedSingleCourse);
-				}
-			}
-			return filteredListCourses;
-		} else {
-			return this.filteredListofCourses; // should actually just return error, should change it later
-		}
-	}
+	// private filterEachCourse(queryField: any, curDataSet: Course[]): Course[] {
+	// 	let where: any = queryField.WHERE;
+	// 	let key: string = Object.keys(where)[0];
+	// 	let InnerLTStatement: any = Object.values(where)[0]; // example: "courses_avg": 92
+	// 	let num: number = Object.values(InnerLTStatement)[0] as number; // this would be 92
+	// 	let IDAndAttribute = Object.keys(InnerLTStatement)[0]; // this would be "courses_avg"
+	// 	let array: string[] = IDAndAttribute.split("_");
+	// 	let attribute: string = array[1]; // avg
+	// 	let filteredListCourses: Course[] = [];
+	// 	if (key === "AND") { // it was verified that the length is at least 1
+	// 		let finalFilteredDataset: Course [] = curDataSet;
+	// 		for (let keys of queryField) {
+	// 			finalFilteredDataset = this.filterEachCourse(keys, finalFilteredDataset);
+	// 		}
+	// 		return finalFilteredDataset;
+	// 	} else if (key === "OR") {
+	// 		let combinedDataset: Course[] = [];
+	// 		for (let keys of queryField) {
+	// 			let tempDataset = this.filterEachCourse(keys, curDataSet);
+	// 			combinedDataset = [...tempDataset, ...combinedDataset]; // destructuring and combining without duplicate
+	// 			// https://stackoverflow.com/questions/1584370/how-to-merge-two-arrays-in-javascript-and-de-duplicate-items
+	// 		}
+	// 		return combinedDataset;
+	// 	} else if (key === "NOT") {
+	// 		let listRequiredToNotBeIncluded = this.filterEachCourse(Object.values(where)[0], curDataSet);
+	// 		let filteredArray: Course[];
+	// 		filteredArray = this.verifiedDataset.filter((x) => !listRequiredToNotBeIncluded.includes(x));
+	// 		return filteredArray;
+	// 	} else if (key === "IS") {
+	// 		let str: string = Object.values(InnerLTStatement)[0] as string;
+	// 		let Strattribute: string = array[1]; // avg
+	// 		for (let singleCourse of this.verifiedDataset) {
+	// 			if (singleCourse[Strattribute] === str) {
+	// 				let copiedSingleCourse: Course = singleCourse;
+	// 				this.deleteField(copiedSingleCourse); // make sure it is the copied course
+	// 				filteredListCourses.push(copiedSingleCourse);
+	// 			}
+	// 		}
+	// 		return filteredListCourses;
+	// 	} else if (key === "EQ") {
+	// 		for (let singleCourse of this.verifiedDataset) {
+	// 			if (singleCourse[attribute] === num) {
+	// 				let copiedSingleCourse: Course = singleCourse;
+	// 				this.deleteField(copiedSingleCourse); // make sure it is the copied course
+	// 				filteredListCourses.push(copiedSingleCourse);
+	// 			}
+	// 		}
+	// 		return filteredListCourses;
+	// 	} else if (key === "GT") {
+	// 		for (let singleCourse of this.verifiedDataset) {
+	// 			if (singleCourse[attribute] > num) {
+	// 				let copiedSingleCourse: Course = singleCourse;
+	// 				this.deleteField(copiedSingleCourse);
+	// 				filteredListCourses.push(copiedSingleCourse);
+	// 			}
+	// 		}
+	// 		return filteredListCourses;
+	// 	} else if (key === "LT") {
+	// 		for (let singleCourse of this.verifiedDataset) {
+	// 			if (singleCourse[attribute] < num) {
+	// 				let copiedSingleCourse: Course = singleCourse;
+	// 				this.deleteField(copiedSingleCourse); // make sure it is the copied course
+	// 				filteredListCourses.push(copiedSingleCourse);
+	// 			}
+	// 		}
+	// 		return filteredListCourses;
+	// 	} else {
+	// 		return this.filteredListofCourses; // should actually just return error, should change it later
+	// 	}
+	// }
 
 
 	private deleteField(course: Course): void { // delete the fields in a course that are not specified in OPTIONS
