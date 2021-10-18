@@ -16,31 +16,41 @@ export default class ValidateHelper {
 		return this.queryID;
 	}
 	public validateAllQuery (query: any): boolean {
-		if (!this.isQueryObject(query)) { // check if the object is undefined or null
+		if (this.isQueryObject (query) === false) { // check if the object is undefined or null
 			this.result = false;
 		} else if (Object.keys(query).length < 1) { // meaning the object is empty
 			return false;
 		}
-		if (!this.hasValidFields(query)) { // has correct length of 1 and has WHERE and OPTION fields
+		if (this.hasValidFields (query) === false) { // has correct length of 1 and has WHERE and OPTION fields
 			this.result = false;
 		}
-		if (!this.validateWhereField(query["WHERE"])) { // goes to check WHERE field
+		if (this.validateWhereField(query["WHERE"]) === false) { // goes to check WHERE field
 			this.result = false;
 		}
-		if (!this.validateOptionsField(query["OPTIONS"])) { // goes to check OPTIONS field
+		if (this.validateOptionsField(query["OPTIONS"]) === false) { // goes to check OPTIONS field
 			this.result = false;
 		} return this.result; // result should be true by default unless set to false by one of the above reasons
 	}
 	public hasValidFields (query: any): boolean {
-		if (!this.hasCorrectLength(query)) { // check if the length of root level field = 2
+		if (this.hasCorrectLength(query) === false) { // check if the length of root level field = 2
 			return false;
-		} return this.hasCorrectRootFields(query);
+		} if (this.hasCorrectRootFields(query) === false) { // check if the fields are WHERE and OPTIONS respectively
+			return false;
+		} return true;
 	}
 	public hasCorrectRootFields (query: any): boolean { // check if the fields are WHERE and OPTIONS respectively
-		return !(Object.keys(query)[0] !== "WHERE" || Object.keys(query)[1] !== "OPTIONS");
+		if (Object.keys(query)[0] !== "WHERE" || Object.keys(query)[1] !== "OPTIONS") {
+			return false;
+		} else {
+			return true;
+		}
 	}
 	public hasCorrectLength (query: any): boolean { // check if length is equaled to 2, since WHERE + OPTION = 2
-		return Object.keys(query).length === 2;
+		if (Object.keys(query).length !== 2) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 	public isQueryObject(object: any): boolean { // check if the query is a valid object
 		if (typeof object !== "object") { // should be an object
@@ -56,7 +66,7 @@ export default class ValidateHelper {
 		}
 	}
 	public validateWhereField(where: any): boolean { // validate WHERE field with helper functions
-		if (!this.isQueryObject(where)) { // return false if the format of the inner query is wrong
+		if (this.isQueryObject(where) === false) { // return false if the format of the inner query is wrong
 			return false;
 		} else if (Object.keys(where).length < 1) { // if WHERE is empty should be ok and return true and no filter
 			return true;
@@ -108,7 +118,7 @@ export default class ValidateHelper {
 			return false;
 		} else {
 			for (let filters of filter) {
-				if (!this.validateRestWhereFilters(filters)) {
+				if (this.validateRestWhereFilters(filters) === false) {
 					return false;
 				}
 			} return true;
@@ -121,12 +131,12 @@ export default class ValidateHelper {
 			return false;
 		} else {
 			for (let filters of filter) {
-				if (!this.validateRestWhereFilters(filters)) {
+				if (this.validateRestWhereFilters(filters) === false) {
 					return false;
 				}
 			}
 			return true;
-		}
+		} return true;
 	}
 	public validateNOT(filter: any): boolean {
 		return this.validateRestWhereFilters(filter);
@@ -136,7 +146,7 @@ export default class ValidateHelper {
 			return false;
 		} else if (Object.keys(filter).length !== 1 ) { // if more than length 1 means invalid
 			return false;
-		} else if (!this.validateStringType(filter)) {
+		} else if ((this.validateStringType(filter) === false)) {
 			return false;
 		} else if (typeof Object.values(filter)[0] !== "string") { // if value type isn't a string return false
 			return false;
@@ -172,7 +182,11 @@ export default class ValidateHelper {
 			return false;
 		} let array: string[];
 		array = filter.split("_");
-		return array.length === 2;
+		if (array.length !== 2) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 	public validateDataSetID(id: string): boolean {
 		if (this.queryID === "") { // no ID has been verified against yet
@@ -190,7 +204,7 @@ export default class ValidateHelper {
 		}
 	}
 	public validateStringType(filter: any): boolean {
-		if (!this.validateIDFormat(filter)) {
+		if (this.validateIDFormat(filter) === false) {
 			return false;
 		}
 		let array: string[];
@@ -221,14 +235,16 @@ export default class ValidateHelper {
 		} else if (Object.keys(option).length === 2) {
 			if (!(Object.keys(option)[0] === "COLUMNS") || !(Object.keys(option)[1] === "ORDER")) {
 				return false;
-			} else if (!this.validateColumnField(Object.values(option)[0])) {
+			} else if (this.validateColumnField(Object.values(option)[0]) === false) {
+				return false;
+			} else if (this.validateOrderField(Object.values(option)[1]) === false) {
 				return false;
 			} else {
-				return this.validateOrderField(Object.values(option)[1]);
+				return true; // should reach here if all conditions are met
 			}
 		} else {
 			return false;
-		}
+		} return false; // shouldn't reach here
 	}
 	public validateColumnField(column: any): boolean {
 		if (!(column.isArray())) {
@@ -262,7 +278,11 @@ export default class ValidateHelper {
 	}
 	public checkIfIDandAddAttributeToColumn(array: any[]): boolean {
 		if (this.validateDataSetID(array[0])) {
-			return this.whereMathField.includes(array[1]) || this.whereStringField.includes(array[1]);
+			if (this.whereMathField.includes(array[1]) || this.whereStringField.includes(array[1])) {
+				return true;
+			} else {
+				return false;
+			}
 		} else {
 			return false;
 		}
