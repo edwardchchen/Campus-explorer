@@ -6,8 +6,9 @@ import {Course} from "./Course";
 export default class QueryEngine {
 	private validateHelper: ValidateHelper;
 	private executeHelper: ExecuteHelper;
-	private tempDataSets: Course;
+	private tempDataSets: Map<string, Course[]>;
 	constructor() {
+		this.tempDataSets = new Map<string, Course[]>();
 		this.validateHelper = new ValidateHelper();
 		this.executeHelper = new ExecuteHelper();
 	}
@@ -22,7 +23,7 @@ export default class QueryEngine {
 				return Promise.reject("id shouldn't be empty");
 			} else {
 				if (this.validateIDwithDataSet(id)) { // validating if the dataset exists with specified ID
-					return Promise.resolve(this.queryExecute(id, this.tempDataSets.get(id), query)); // not sure if the resolve works?
+					return Promise.resolve(this.queryExecute(id, dataSet.get(id), query)); // not sure if the resolve works?
 				} else {
 					return Promise.reject("id doesn't exist in dataSets");
 				}

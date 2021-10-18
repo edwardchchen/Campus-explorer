@@ -1,3 +1,4 @@
+/* eslint-disable */
 export default class ValidateHelper {
 	private whereMathField: string[] = ["avg", "pass", "fail", "audit", "year"];
 	private whereStringField: string[] = ["dept", "id", "instructor", "title", "uuid"];
@@ -12,16 +13,16 @@ export default class ValidateHelper {
 		this.columnField = [];
 		this.requiresOrder = false;
 	}
-	public findID (): string {
+	public findID(): string {
 		return this.queryID;
 	}
-	public validateAllQuery (query: any): boolean {
-		if (this.isQueryObject (query) === false) { // check if the object is undefined or null
+	public validateAllQuery(query: any): boolean {
+		if (this.isQueryObject(query) === false) { // check if the object is undefined or null
 			this.result = false;
 		} else if (Object.keys(query).length < 1) { // meaning the object is empty
 			return false;
 		}
-		if (this.hasValidFields (query) === false) { // has correct length of 1 and has WHERE and OPTION fields
+		if (this.hasValidFields(query) === false) { // has correct length of 1 and has WHERE and OPTION fields
 			this.result = false;
 		}
 		if (this.validateWhereField(query["WHERE"]) === false) { // goes to check WHERE field
@@ -29,23 +30,26 @@ export default class ValidateHelper {
 		}
 		if (this.validateOptionsField(query["OPTIONS"]) === false) { // goes to check OPTIONS field
 			this.result = false;
-		} return this.result; // result should be true by default unless set to false by one of the above reasons
+		}
+		return this.result; // result should be true by default unless set to false by one of the above reasons
 	}
-	public hasValidFields (query: any): boolean {
+	public hasValidFields(query: any): boolean {
 		if (this.hasCorrectLength(query) === false) { // check if the length of root level field = 2
 			return false;
-		} if (this.hasCorrectRootFields(query) === false) { // check if the fields are WHERE and OPTIONS respectively
+		}
+		if (this.hasCorrectRootFields(query) === false) { // check if the fields are WHERE and OPTIONS respectively
 			return false;
-		} return true;
+		}
+		return true;
 	}
-	public hasCorrectRootFields (query: any): boolean { // check if the fields are WHERE and OPTIONS respectively
+	public hasCorrectRootFields(query: any): boolean { // check if the fields are WHERE and OPTIONS respectively
 		if (Object.keys(query)[0] !== "WHERE" || Object.keys(query)[1] !== "OPTIONS") {
 			return false;
 		} else {
 			return true;
 		}
 	}
-	public hasCorrectLength (query: any): boolean { // check if length is equaled to 2, since WHERE + OPTION = 2
+	public hasCorrectLength(query: any): boolean { // check if length is equaled to 2, since WHERE + OPTION = 2
 		if (Object.keys(query).length !== 2) {
 			return false;
 		} else {
@@ -55,11 +59,11 @@ export default class ValidateHelper {
 	public isQueryObject(object: any): boolean { // check if the query is a valid object
 		if (typeof object !== "object") { // should be an object
 			return false;
-		} else if (object.isArray()) { // should be a json object
+		} else if (object instanceof Array) { // should be a json object
 			return false;
 		} else if (object === undefined) { // shouldn't be undefined
 			return false;
-		}else if (object === null) { // cannot be a null type
+		} else if (object === null) { // cannot be a null type
 			return false;
 		} else {
 			return true;
@@ -103,7 +107,7 @@ export default class ValidateHelper {
 	public validateLTGTEQ(filter: any): boolean { // the procedure for checking LT, GT, and EQ is the same
 		if (!this.isQueryObject(filter)) { // check if it is a valid object
 			return false;
-		} else if (Object.keys(filter).length !== 1 ) { // if length of the key isn't 1 then it is invalid
+		} else if (Object.keys(filter).length !== 1) { // if length of the key isn't 1 then it is invalid
 			return false;
 		} else if (typeof Object.values(filter)[0] !== "number") { // if the type of its value isn't a number then invalid
 			return false;
@@ -112,20 +116,7 @@ export default class ValidateHelper {
 		}
 	}
 	public validateAND(filter: any): boolean { // validate AND, goes to recurrsion since the body after AND will have length 1 or more
-		if (!(filter.isArray())) { // needs to be an array otherwise false
-			return false;
-		} else if (filter.length < 1) {
-			return false;
-		} else {
-			for (let filters of filter) {
-				if (this.validateRestWhereFilters(filters) === false) {
-					return false;
-				}
-			} return true;
-		}
-	}
-	public validateOR(filter: any): boolean { // Validate for OR, checking inner OR functions
-		if (!(filter.isArray())) {
+		if (!(filter instanceof Array)) { // needs to be an array otherwise false
 			return false;
 		} else if (filter.length < 1) {
 			return false;
@@ -136,7 +127,22 @@ export default class ValidateHelper {
 				}
 			}
 			return true;
-		} return true;
+		}
+	}
+	public validateOR(filter: any): boolean { // Validate for OR, checking inner OR functions
+		if (!(filter instanceof Array)) {
+			return false;
+		} else if (filter.length < 1) {
+			return false;
+		} else {
+			for (let filters of filter) {
+				if (this.validateRestWhereFilters(filters) === false) {
+					return false;
+				}
+			}
+			return true;
+		}
+		return true;
 	}
 	public validateNOT(filter: any): boolean {
 		return this.validateRestWhereFilters(filter);
@@ -144,9 +150,9 @@ export default class ValidateHelper {
 	public validateIS(filter: any): boolean {
 		if (!this.isQueryObject(filter)) {
 			return false;
-		} else if (Object.keys(filter).length !== 1 ) { // if more than length 1 means invalid
+		} else if (Object.keys(filter).length !== 1) { // if more than length 1 means invalid
 			return false;
-		} else if ((this.validateStringType(filter) === false)) {
+		} else if ((this.validateStringType(Object.keys(filter)[0]) === false)) {
 			return false;
 		} else if (typeof Object.values(filter)[0] !== "string") { // if value type isn't a string return false
 			return false;
@@ -169,19 +175,23 @@ export default class ValidateHelper {
 	public validateNumberType(filter: any): boolean { // need revision for formatting
 		if (!this.validateIDFormat(filter)) {
 			return false;
-		} let array: string[];
+		}
+		let array: string[];
 		array = filter.split("_");
 		if (array.length === 1) {
 			return false;
-		} if (!this.whereMathField.includes(filter)) {
+		}
+		if (!this.whereMathField.includes(array[1])) {
 			return false;
-		} return this.validateDataSetID(array[0]);
+		}
+		return this.validateDataSetID(array[0]);
 	}
 	public validateIDFormat(filter: any): boolean { // need revision for formatting
-		if (!(typeof filter === "string")) {
-			return false;
-		} let array: string[];
+		let array: string[];
 		array = filter.split("_");
+		if (!(typeof array[0] === "string") && !(typeof array[1] === "string")) {
+			return false;
+		}
 		if (array.length !== 2) {
 			return false;
 		} else {
@@ -212,7 +222,7 @@ export default class ValidateHelper {
 		if (array.length === 1) {
 			return false;
 		}
-		if (this.whereStringField.includes(filter)) {
+		if (!this.whereStringField.includes(array[1])) {
 			return false;
 		} else {
 			return this.validateDataSetID(array[0]);
@@ -244,10 +254,11 @@ export default class ValidateHelper {
 			}
 		} else {
 			return false;
-		} return false; // shouldn't reach here
+		}
+		return false; // shouldn't reach here
 	}
 	public validateColumnField(column: any): boolean {
-		if (!(column.isArray())) {
+		if (!(column instanceof Array)) {
 			return false;
 		} else if (column.length < 1) {
 			return false;
@@ -257,10 +268,11 @@ export default class ValidateHelper {
 					return false;
 				}
 			}
-		} return true;
+		}
+		return true;
 	}
 	public validateAttribute(attribute: any): boolean {
-		if (!attribute.isString()) {
+		if (!(typeof attribute === "string")) {
 			return false;
 		}
 		let array: string[];
@@ -269,7 +281,7 @@ export default class ValidateHelper {
 			return false;
 		} else {
 			if (this.checkIfIDandAddAttributeToColumn(array)) {
-				this.columnField.push (attribute);
+				this.columnField.push(attribute);
 				return true;
 			} else {
 				return false;
@@ -288,7 +300,7 @@ export default class ValidateHelper {
 		}
 	}
 	public validateOrderField(order: any): boolean {
-		if (order.isString()) {
+		if (typeof order === "string") {
 			let ret: boolean = this.columnField.includes(order);
 			this.requiresOrder = true; // means that sorting is required in execution
 			this.orderBy = order;

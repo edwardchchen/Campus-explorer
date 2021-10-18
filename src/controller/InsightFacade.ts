@@ -12,7 +12,7 @@ export default class InsightFacade implements IInsightFacade {
 
 	// Question: is this how we can store dataSets after addDataset?
 	public qe: QueryEngine;
-	public dataStore: DataStore
+	public dataStore: DataStore;
 
 
 	constructor() {

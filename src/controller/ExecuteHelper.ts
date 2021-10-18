@@ -55,7 +55,8 @@ export default class ExecuteHelper {
 	}
 	private orFilter(queryField: any, curDataSet: Course[]): Course[] {
 		let combinedDataset: Course[] = [];
-		for (let keys of queryField) {
+		let innerkey = Object.values(queryField);
+		for (let keys of innerkey) {
 			let tempDataset = this.filterEachCourse(keys, curDataSet);
 			combinedDataset = [...tempDataset, ...combinedDataset]; // destructuring and combining without duplicate
 			// https://stackoverflow.com/questions/1584370/how-to-merge-two-arrays-in-javascript-and-de-duplicate-items
@@ -94,7 +95,7 @@ export default class ExecuteHelper {
 		if (key === "AND") {// it was verified that the length is at least 1
 			return this.andFilter(queryField,curDataSet);
 		} else if (key === "OR") {
-			return this.orFilter(queryField,curDataSet);
+			return this.orFilter(InnerLTStatement,curDataSet);
 		} else if (key === "NOT") {
 			return this.notFilter(where,curDataSet);
 		} else if (key === "IS") {
