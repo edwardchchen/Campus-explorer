@@ -281,7 +281,7 @@ export default class ValidateHelper {
 			return false;
 		} else {
 			if (this.checkIfIDandAddAttributeToColumn(array)) {
-				this.columnField.push(attribute);
+				this.columnField.push(array[1]);
 				return true;
 			} else {
 				return false;
@@ -301,9 +301,11 @@ export default class ValidateHelper {
 	}
 	public validateOrderField(order: any): boolean {
 		if (typeof order === "string") {
-			let ret: boolean = this.columnField.includes(order);
+			let array: string[];
+			array = order.split("_");
+			let ret: boolean = this.columnField.includes(array[1]);
 			this.requiresOrder = true; // means that sorting is required in execution
-			this.orderBy = order;
+			this.orderBy = array[1];
 			return ret;
 		} else {
 			return false;
