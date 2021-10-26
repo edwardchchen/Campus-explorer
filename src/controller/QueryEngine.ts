@@ -13,9 +13,7 @@ export default class QueryEngine {
 		this.executeHelper = new ExecuteHelper();
 	}
 	public runQuery(query: any, dataSet: any): Promise<any[]> { // return the list of InsightFacade
-		console.log(query);
 		if (this.queryValidate(query)) {
-
 			this.tempDataSets = dataSet;
 			let id: string;
 			id = this.validateHelper.findID();

@@ -39,14 +39,36 @@ export default class ExecuteHelper {
 				return Promise.reject(new ResultTooLargeError(this.verifiedDataset.length));
 			}
 			if (this.validateHelper.requiresOrder) {
-				return Promise.resolve(this.orderSort());
+				this.verifiedDataset = this.orderSort();
+				this.verifiedDataset = this.addIdIntoFields(this.verifiedDataset);
+				return Promise.resolve(this.verifiedDataset);
 			} else {
+				this.verifiedDataset = this.addIdIntoFields(this.verifiedDataset);
 				return Promise.resolve(this.verifiedDataset);
 			}
 
 		}catch (e){
 			return Promise.reject(new InsightError());
 		}
+	}
+	private addIdIntoFields(courses: Course[]): Course[]{
+		let keys: string[];
+		let oldKeys: string[];
+		if(courses.length > 0){
+			keys = Object.keys(courses[0]);
+			oldKeys = Object.keys(courses[0]);
+			for(let i = 0;i < keys.length;i++){
+				keys[i] = this.id + "_" + keys[i];
+			}
+			for(const element of courses){
+				for(let j = 0;j < keys.length;j++){
+					element[keys[j]] = element[oldKeys[j]];
+					delete element[oldKeys[j]];
+				}
+			}
+		}
+		return this.verifiedDataset;
+
 	}
 
 	private andFilter(queryField: any, curDataSet: Course[]): Course[] {
