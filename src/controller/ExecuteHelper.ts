@@ -119,6 +119,7 @@ export default class ExecuteHelper {
 			let finalFilteredDataset: Course [] = curDataSet;
 			for (let keys of InnerLTStatement) {
 				finalFilteredDataset = this.filterEachCourse(keys, finalFilteredDataset);
+				console.log(finalFilteredDataset);
 			}
 			return finalFilteredDataset;
 		} else if (key === "OR") {
@@ -137,7 +138,7 @@ export default class ExecuteHelper {
 		} else if (key === "IS") {
 			let str: string = Object.values(InnerLTStatement)[0] as string;
 			let Strattribute: string = array[1]; // avg
-			for (let singleCourse of this.passedInDataset) {
+			for (let singleCourse of curDataSet) {
 				if (singleCourse[Strattribute] === str) {
 					let copiedSingleCourse: Course = singleCourse;
 					this.deleteField(copiedSingleCourse); // make sure it is the copied course
@@ -146,7 +147,7 @@ export default class ExecuteHelper {
 			}
 			return filteredListCourses;
 		} else if (key === "EQ") {
-			for (let singleCourse of this.passedInDataset) {
+			for (let singleCourse of curDataSet) {
 				if (singleCourse[attribute] === num) {
 					// let copiedSingleCourse: Course = singleCourse;
 					let copiedSingleCourse: Course;
@@ -157,7 +158,7 @@ export default class ExecuteHelper {
 			}
 			return filteredListCourses;
 		} else if (key === "GT") {
-			for (let singleCourse of this.passedInDataset) {
+			for (let singleCourse of curDataSet) {
 				if (singleCourse[attribute] > num) {
 					let copiedSingleCourse: Course = singleCourse;
 					// let copiedSingleCourse: Course;
@@ -168,7 +169,7 @@ export default class ExecuteHelper {
 			}
 			return filteredListCourses;
 		} else if (key === "LT") {
-			for (let singleCourse of this.passedInDataset) {
+			for (let singleCourse of curDataSet) {
 				if (singleCourse[attribute] < num) {
 					// let copiedSingleCourse: Course = singleCourse;
 					let copiedSingleCourse: Course;
