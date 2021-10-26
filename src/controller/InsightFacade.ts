@@ -1,4 +1,4 @@
-import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError, NotFoundError} from "./IInsightFacade";
+import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError} from "./IInsightFacade";
 import QueryEngine from "./QueryEngine";
 
 import DataStore from "./DataStore";
@@ -24,9 +24,17 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
-		return Promise.resolve(this.dataStore.addDataset(id, content, kind)).then((r) => {
-			return r;
-		});
+		if(kind === InsightDatasetKind.Rooms){
+			return Promise.resolve(this.dataStore.addRoomDataset(id, content, kind)).then((r) => {
+				return r;
+			});
+		}
+		if(kind === InsightDatasetKind.Courses){
+			return Promise.resolve(this.dataStore.addDataset(id, content, kind)).then((r) => {
+				return r;
+			});
+		}
+		return Promise.reject(new InsightError());
 	}
 
 	public removeDataset(id: string): Promise<string> {

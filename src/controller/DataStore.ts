@@ -60,9 +60,47 @@ export default class DataStore{
 		if(this.dataMap.get(id)) {
 			return true;
 		}
-		if(kind === InsightDatasetKind.Rooms){
-			return true;
+	}
+	public addRoomDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
+		if(this.isInValid(id,kind)){
+			return Promise.reject(new InsightError());
 		}
+		let zip = new JSZip();
+		const promises: any[] = [];
+		return zip.loadAsync(content, {base64: true})
+			.then((r: JSZip) =>{
+				return r;
+			}).then((results: JSZip)=>{
+				Object.keys(results.files).forEach(function (filename) {
+					promises.push(zip.files[filename].async("string"));
+				});
+				return Promise.all(promises)
+					.then((data) => {
+						const parse5 = require("parse5");
+
+						let jsonArray: Course[] = [];
+						// const document = parse5.parse(data);
+						console.log(data);
+
+						// data.forEach((value) => {
+						//
+						// });
+						if(jsonArray.length === 0){
+							return Promise.reject(new InsightError());
+						}
+						this.dataMap.set(id,jsonArray);
+						this.dataSets.push({id:id,kind:kind,numRows:jsonArray.length});
+						let existingKeys: string[] = [];
+						this.dataSets.forEach(function(val){
+							existingKeys.push(val.id);
+						});
+						return existingKeys;
+					});
+			}).catch((e)=>{
+				return Promise.reject(new InsightError());
+			}).then((res: any)=>{
+				return Promise.resolve(res);
+			});
 	}
 
 	public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
