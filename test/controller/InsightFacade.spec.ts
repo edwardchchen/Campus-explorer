@@ -1,4 +1,9 @@
-import {InsightDatasetKind, InsightError, ResultTooLargeError} from "../../src/controller/IInsightFacade";
+import {
+	InsightDataset,
+	InsightDatasetKind,
+	InsightError,
+	ResultTooLargeError
+} from "../../src/controller/IInsightFacade";
 import InsightFacade from "../../src/controller/InsightFacade";
 
 import * as fs from "fs-extra";
@@ -16,6 +21,7 @@ describe("InsightFacade", function () {
 	// automatically be loaded in the 'before' hook.
 	const datasetsToLoad: {[key: string]: string} = {
 		courses: "./test/resources/archives/courses.zip",
+		rooms: "./test/resources/archives/rooms.zip"
 	};
 
 	before(function () {
@@ -53,6 +59,7 @@ describe("InsightFacade", function () {
 
 		// This is a unit test. You should create more like this!
 		it("Should add a valid dataset", function () {
+			this.timeout(5000);
 			const id: string = "courses";
 			const content: string = datasetContents.get("courses") ?? "";
 			const expected: string[] = [id];
@@ -60,6 +67,35 @@ describe("InsightFacade", function () {
 				expect(result).to.deep.equal(expected);
 			});
 		});
+		// This is a unit test. You should create more like this!
+		it("Should add a valid Room dataset", function () {
+			this.timeout(5000);
+
+			const id: string = "courses";
+			const content: string = datasetContents.get("rooms") ?? "";
+			const expected: string[] = [id];
+			return insightFacade.addDataset(id, content, InsightDatasetKind.Rooms).then((result: string[]) => {
+				expect(result).to.deep.equal(expected);
+			});
+		});
+		it("it should return 2 datasets", function (){
+			const content: string = datasetContents.get("rooms") ?? "";
+
+			this.timeout(5000);
+			return insightFacade.addDataset("courses", content, InsightDatasetKind.Rooms)
+				.then((res: string[])=>{
+					return insightFacade.addDataset("courses1", content, InsightDatasetKind.Rooms);
+				}).then((res: string[])=>{
+					return insightFacade.listDatasets();
+				}).then((res: InsightDataset[])=>{
+					return res;
+				}).then((res: InsightDataset[])=>{
+					expect(res.length).equals(2);
+				}).catch((e)=>{
+					expect.fail();
+				});
+		});
+
 	});
 
 	/*
@@ -68,8 +104,10 @@ describe("InsightFacade", function () {
 	 * You can still make tests the normal way, this is just a convenient tool for a majority of queries.
 	 */
 	describe("PerformQuery", () => {
+
 		before(function () {
 			console.info(`Before: ${this.test?.parent?.title}`);
+			this.timeout(10000);
 
 			insightFacade = new InsightFacade();
 
@@ -88,7 +126,6 @@ describe("InsightFacade", function () {
 		});
 
 		type PQErrorKind = "ResultTooLargeError" | "InsightError";
-
 		testFolder<any, any[], PQErrorKind>(
 			"Dynamic InsightFacade PerformQuery tests",
 			(input) => insightFacade.performQuery(input),

@@ -1,4 +1,4 @@
-import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError, NotFoundError} from "./IInsightFacade";
+import {IInsightFacade, InsightDataset, InsightDatasetKind, InsightError} from "./IInsightFacade";
 import QueryEngine from "./QueryEngine";
 
 import DataStore from "./DataStore";
@@ -12,7 +12,7 @@ export default class InsightFacade implements IInsightFacade {
 
 	// Question: is this how we can store dataSets after addDataset?
 	public qe: QueryEngine;
-	public dataStore: DataStore
+	public dataStore: DataStore;
 
 
 	constructor() {
@@ -24,9 +24,20 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
-		return Promise.resolve(this.dataStore.addDataset(id, content, kind)).then((r) => {
-			return r;
-		});
+		if(kind === InsightDatasetKind.Rooms){
+			return Promise.resolve(this.dataStore.addRoomDataset(id, content, kind)).then((r) => {
+				return this.dataStore.callApi(this.dataStore.roomMap.get(id)).then((e: any)=>{
+					return r;
+
+				});
+			});
+		}
+		if(kind === InsightDatasetKind.Courses){
+			return Promise.resolve(this.dataStore.addDataset(id, content, kind)).then((r) => {
+				return r;
+			});
+		}
+		return Promise.reject(new InsightError());
 	}
 
 	public removeDataset(id: string): Promise<string> {
@@ -50,7 +61,7 @@ export default class InsightFacade implements IInsightFacade {
 
 	public performQuery(query: any): Promise<any[]> { // shouldn't I return InsightDataset?
 		// Should I do a JSON.Parse? Or just Object.Keys(query), what is query really?
-		return this.qe.runQuery(query, this.dataStore.dataMap); // should I take in a Dataset object as parameter as well? Otherwise how can I have the file for fillter?
+		return this.qe.runQuery(query, this.dataStore); // should I take in a Dataset object as parameter as well? Otherwise how can I have the file for fillter?
 	}
 
 	public listDatasets(): Promise<InsightDataset[]> {

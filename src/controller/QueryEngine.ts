@@ -1,73 +1,84 @@
-import {InsightDataset, InsightError, ResultTooLargeError} from "./IInsightFacade";
+import {InsightDatasetKind, InsightError} from "./IInsightFacade";
 import ValidateHelper from "./ValidateHelper";
-import ExecuteHelper from "./ExecuteHelper";
+import CourseQueryExecuteHelper from "./CourseQueryExecuteHelper";
 import {Course} from "./Course";
+import DataStore from "./DataStore";
+import {Room} from "./Room";
+import RoomQueryExecuteHelper from "./RoomQueryExecuteHelper";
 
 export default class QueryEngine {
 	private validateHelper: ValidateHelper;
-	private executeHelper: ExecuteHelper;
-	private tempDataSets: Course;
+	private courseQueryExecuteHelper: CourseQueryExecuteHelper;
+	private tempCourseDataSets: Map<string, Course[]>;
+	private tempRoomDataSets: Map<string, Room[]>;
+	private tempDataStore: DataStore;
+	private roomQueryExecuteHelper: RoomQueryExecuteHelper;
 	constructor() {
+		this.tempCourseDataSets = new Map<string, Course[]>();
+		this.tempRoomDataSets = new Map<string, Room[]>();
 		this.validateHelper = new ValidateHelper();
-		this.executeHelper = new ExecuteHelper();
-	}
-	public runQuery(query: any, dataSet: any): Promise<any[]>{ // return the list of InsightFacade
-		return new Promise<any[]>((resolve, reject) => { // resolve goes to the then block,
-			this.queryValidate(query).then(() => {
-				this.tempDataSets = dataSet;
-				let id: string;
-				id = this.validateHelper.findID();
-				if (id === "") {
-					reject("id shouldn't be empty");
-				} else {
-					if (this.validateIDwithDataSet(id)) { // validating if the dataset exists with specified ID
-						resolve (this.queryExecute(id, this.tempDataSets.get(id), query)); // not sure if the resolve works?
-					} else {
-						reject("id doesn't exist in dataSets");
-					}
-				}
-
-				// get ID from the query and retrieve that ID from the dataset
-				// var id = query.getID;
-				// return this.queryExecute(query, dataSet); // execute query based on the ID of the query
-			}).catch();
-
-		}); // call queryValidate and then queryExecute, might want to make them different ts classes
+		this.courseQueryExecuteHelper = new CourseQueryExecuteHelper();
+		this.roomQueryExecuteHelper = new RoomQueryExecuteHelper();
+		this.tempDataStore = new DataStore();
 	}
 
-
-	private queryValidate(query: any): Promise<void> {
-		return new Promise<void>((resolve, reject) => {
-			if (this.validateHelper.validateAllQuery(query)) {
-				//
-				resolve();
+	public runQuery(query: any, localDataStore: any): Promise<any[]> { // return the list of InsightFacade
+		if (this.queryValidate(query)) {
+			this.tempDataStore = localDataStore;
+			let id: string;
+			id = this.validateHelper.findID();
+			if (id === "") {
+				return Promise.reject("id shouldn't be empty");
 			} else {
-				reject(new InsightError("Query is Invalid"));
+				if (this.validateHelper.isCourseQuery) { // is Course
+					if (this.validateCourseIDwithDataSet(id)) { // validating if the dataset exists with specified ID
+						this.tempCourseDataSets = this.tempDataStore.dataMap;
+						return Promise.resolve(this.courseQueryExecute(id, this.tempCourseDataSets.get(id), query)); // not sure if the resolve works?
+					} else {
+						return Promise.reject("id doesn't exist in dataSets");
+					}
+				} else if (this.validateHelper.isRoomQuery){ // is ROOM
+					if (this.validateRoomIDwithDataSet(id)) { // validating if the dataset exists with specified ID
+						this.tempRoomDataSets = this.tempDataStore.roomMap;
+						return Promise.resolve(this.roomQueryExecute(id, this.tempRoomDataSets.get(id), query)); // not sure if the resolve works?
+					} else {
+						return Promise.reject("id doesn't exist in dataSets");
+					}
+				} else {
+					return Promise.reject("error, should be either ROOM or COURSE query");
+				}
 			}
-		});
-
-		// validate if it is a valid JSON object and not other types of objects
-		// validate if it has the required fields
-		// validate if the length of keys is correct
-		// validate spelling for each key
-		// validate WHERE
-		// validate OPTION
-		// validate if it can be successfully transformed into InsightFacade list
+		}
+		return Promise.reject(new InsightError());
 	}
 
-	private validateIDwithDataSet(id: string): boolean {
-		return this.tempDataSets.has(id);
+	private queryValidate(query: any): boolean {
+		return this.validateHelper.validateAllQuery(query);
 	}
 
-	private queryExecute(id: string, dataSet: any, query: any): Promise<any>{ // should return an array with correct result
-		return this.executeHelper.executeAndOrder(id, dataSet, this.validateHelper, query);
-		// figure out the WHERE clause
-		// figure out with WHERE conditions, what columns need to be displayed
-		// For each class section of that id, according to the WHERE condition, select the columns and add into the array
-		// If there is ORDER, then in that array, use for each and order with some type of sorting
-
-
+	private validateCourseIDwithDataSet(id: string): boolean {
+		for (let singleInsightFacade of this.tempDataStore.dataSets) {
+			if ((singleInsightFacade.kind === InsightDatasetKind.Courses) && (singleInsightFacade.id === id)) {
+				return true;
+			}
+		}
+		return false; // none of the IDs match with this criteria
 	}
 
+	private validateRoomIDwithDataSet(id: string): boolean {
+		for (let singleInsightFacade of this.tempDataStore.dataSets) {
+			if ((singleInsightFacade.kind === InsightDatasetKind.Rooms) && (singleInsightFacade.id === id)) {
+				return true;
+			}
+		}
+		return false; // none of the IDs match with this criteria
+	}
 
+	private courseQueryExecute(id: string, courseDataSet: any, query: any): Promise<any>{ // should return an array with correct result
+		return this.courseQueryExecuteHelper.executeAndOrder(id, courseDataSet, this.validateHelper, query);
+	}
+
+	private roomQueryExecute(id: string, roomDataSet: any, query: any): Promise<any>{ // should return an array with correct result
+		return this.roomQueryExecuteHelper.executeAndOrder(id, roomDataSet, this.validateHelper, query);
+	}
 }

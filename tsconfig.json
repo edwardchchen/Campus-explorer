@@ -4,7 +4,7 @@
 		"outDir": "dist",
 		"noImplicitAny": true,
 		"removeComments": true,
-		"strictPropertyInitialization": false,
+		"strictPropertyInitialization": true,
 		"preserveConstEnums": true,
 		"sourceMap": true,
 		"typeRoots": [
