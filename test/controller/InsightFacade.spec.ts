@@ -63,6 +63,8 @@ describe("InsightFacade", function () {
 		});
 		// This is a unit test. You should create more like this!
 		it("Should add a valid Room dataset", function () {
+			this.timeout(5000);
+
 			const id: string = "courses";
 			const content: string = datasetContents.get("rooms") ?? "";
 			const expected: string[] = [id];

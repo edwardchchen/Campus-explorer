@@ -2,7 +2,7 @@ import {InsightDataset, InsightDatasetKind, InsightError, NotFoundError} from ".
 import JSZip from "jszip";
 import {Course} from "./Course";
 import {Room} from "./Room";
-
+import GeoHelper from "./GeoHelper";
 
 export default class DataStore{
 	public dataSets: InsightDataset[]
@@ -10,7 +10,7 @@ export default class DataStore{
 	public roomMap: Map<string, Room[]> = new Map<string, Room[]>();
 	private requiredBuildings: Set<string> = new Set<string>();
 	private parse5 = require("parse5");
-
+	private geoHelper = new GeoHelper();
 	constructor() {
 		this.dataSets = [];
 	}
@@ -79,31 +79,69 @@ export default class DataStore{
 		});
 		return locationNameSet;
 	}
-	private extractRooms(data: string): any{
+	private extractRooms(data: string): Room[]{
+		let res: Room[] = [];
 		const roomInfo = data.slice( data.indexOf( "<tbody>" ) + 8,data.indexOf( "</tbody>"));
 		const buildingInfo = data.slice( data.indexOf( "<div id=\"building-info\">" ),
 			data.indexOf( "<div id=\"building-image\">"));
 		let buildingName = buildingInfo.slice(buildingInfo.indexOf("<h2><span class=\"field-content\">") + 32,
 			buildingInfo.indexOf("</span></h2>"));
-		let buildingAddress = buildingInfo.slice(buildingInfo.indexOf("</h2>\n" +
+		let address = buildingInfo.slice(buildingInfo.indexOf("</h2>\n" +
 			"\t\t<div class=\"building-field\"><div class=\"field-content\">") + 63,
 		buildingInfo.indexOf("</div></div>"));
 		let parsed = this.parse5.parse(roomInfo);
 		parsed = parsed.childNodes[0].childNodes[1].childNodes;
-		parsed.forEach((element: any)=> {
-			if (element.nodeName === "a") {
-				let url = element.attrs[0].value;
-				url = url.substring(url.lastIndexOf("/") + 1, url.length);
-				// console.log(url);
-			}else if(element.nodeName === "#text"){
-				let text = element.value;
+		for(let i = 1;i < parsed.length - 2;i += 4){
+			let shortname, number,name,seats,type,furniture,href;
+			if (parsed[i].nodeName === "a") {
+				href = parsed[i].attrs[0].value;
+				name = href.substring(href.lastIndexOf("/") + 1, href.length);
+				name = name.replace("-","_");
+				number = name.substr(name.indexOf("_") + 1,name.length);
+				shortname = name.substr(0,name.indexOf("_"));
+			}if(parsed[i + 1].nodeName === "#text"){
+				let text = parsed[i + 1].value;
 				text = text.replace(/(\r\n|\n|\r)/gm, "");
 				let splitted = text.split("  ");
-				let set = new Set<string>(splitted);
+				let set  = new Set<string>(splitted);
+				seats =  [...set][1];
+				furniture =  [...set][2];
+				type =  [...set][3];
 			}
-		});
-		return null;
+			if(!this.requiredBuildings.has(shortname)){
+				return res;
+			}
+			res.push(DataStore.convertIntoRoom(buildingName,shortname,number,name,address,
+				Number(seats),String(type),String(furniture),href));
+		}
+		return res;
+	}
+	private static convertIntoRoom(fullname: string, shortname: string, number: string, name: string, address: string,
+		seats: number, type: string, furniture: string, href: string): Room{
+		return {
+			fullname: fullname,
+			shortname: shortname,
+			number: number,
+			name: name,
+			address: address,
+			seats: seats,
+			type: type,
+			furniture: furniture,
+			href: href,
+			lat: 0,
+			lon: 0
+		};
 
+	}
+	private callApi(roomArray: Room[]): any {
+		const promises: any[] = [];
+		if(roomArray.length > 0) {
+			let address = roomArray[0].address;
+			promises.push(this.geoHelper.findCoordinates(address,null));
+			return Promise.all(promises).then((data: any) => {
+				return data;
+			});
+		}
 	}
 
 	public addRoomDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
@@ -132,10 +170,17 @@ export default class DataStore{
 						return Promise.all(roomPromises);
 					})
 					.then((data: string[]) => {
-						this.extractRooms(data[8]);
-						// data.forEach((value)=>{
-						// 	this.extractRooms(value);
-						// });
+						// return this.callApi(this.extractRooms(data[10]));
+						let rooms: Room[] = [];
+						data.forEach((value)=>{
+							if(value !== ""){
+								rooms.push(...this.extractRooms(value));
+							}
+						});
+						console.log(this.requiredBuildings);
+						// console.log(rooms);
+					}).then((data: any) => {
+						console.log(data[0]);
 					});
 
 			}).catch((e)=>{
