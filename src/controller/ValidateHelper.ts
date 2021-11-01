@@ -4,7 +4,9 @@ export default class ValidateHelper {
 	public whereCourseMathField: string[] = ["avg", "pass", "fail", "audit", "year"];
 	public whereCourseStringField: string[] = ["dept", "id", "instructor", "title", "uuid"];
 	public whereRoomMathField: string[] = ["lat", "lon", "seats"];
-	public whereRoomStringField: string[] = ["fullname", "shortname", "number", "name", "address", "type", "furniture", "href"];
+	public whereRoomStringField: string[] = ["fullname", "shortname", "number", "name", "address",
+		"type", "furniture", "href"];
+
 	public isRoomQuery: boolean = false;
 	public isCourseQuery: boolean = false;
 	private queryID: string;
@@ -24,9 +26,11 @@ export default class ValidateHelper {
 		this.requireTransformation = false;
 		this.validateTransformation = new ValidateTransformation();
 	}
+
 	public findID(): string {
 		return this.queryID;
 	}
+
 	public validateAllQuery(query: any): boolean {
 		if (this.isQueryObject(query) === false) { // check if the object is undefined or null
 			return false;
@@ -44,26 +48,31 @@ export default class ValidateHelper {
 		}
 		if (this.requireTransformation) {
 			if (!this.validateTransformationField(query["TRANSFORMATIONS"])) {
-				return false
+				return false;
 			}
 		}
 		return true; // result should be true by default unless set to false by one of the above reasons
 	}
+
 	public validateTransformationField(query: any): boolean {
 		return this.validateTransformation.validateAllTransformation(query, this);
 	}
+
 	public hasValidFields(query: any): boolean {
 		if ((Object.keys(query).length === 2) &&
 			(Object.keys(query)[0] === "WHERE" && Object.keys(query)[1] === "OPTIONS")) {
 			return true;
-		} else if ((Object.keys(query).length === 2) &&
-			(Object.keys(query)[0] === "WHERE" && Object.keys(query)[1] === "OPTIONS" && Object.keys(query)[2] === "TRANSFORMATIONS")) {
+		}
+		if ((Object.keys(query).length === 2) &&
+			(Object.keys(query)[0] === "WHERE" && Object.keys(query)[1] === "OPTIONS" &&
+				Object.keys(query)[2] === "TRANSFORMATIONS")) {
 			this.requireTransformation = true;
 			return true;
 		} else {
 			return false;
 		}
 	}
+
 	public isQueryObject(object: any): boolean { // check if the query is a valid object
 		if (typeof object !== "object") { // should be an object
 			return false;
@@ -77,6 +86,7 @@ export default class ValidateHelper {
 			return true;
 		}
 	}
+
 	public validateWhereField(where: any): boolean { // validate WHERE field with helper functions
 		if (this.isQueryObject(where) === false) { // return false if the format of the inner query is wrong
 			return false;
@@ -86,6 +96,7 @@ export default class ValidateHelper {
 			return this.validateFirstWhereFilters(where); // goes here only if there is something within the WHERE clause
 		}
 	}
+
 	public validateFirstWhereFilters(where: any): boolean { // check the first key within the WHERE clause, should only have length 1
 		let listFilter: string[] = ["LT", "GT", "EQ", "AND", "OR", "NOT", "IS"];
 		if (!(Object.keys(where).length === 1)) {
@@ -96,6 +107,7 @@ export default class ValidateHelper {
 			return this.validateInnerFilter(where); // else check inner filter
 		}
 	}
+
 	public validateInnerFilter(where: any): boolean { // check each possible filter
 		let filter: string = Object.keys(where)[0];
 		if (filter === "LT" || filter === "GT" || filter === "EQ") {
@@ -112,6 +124,7 @@ export default class ValidateHelper {
 			return false; // shouldn't reach here because where should be one of the filter types
 		}
 	}
+
 	public validateLTGTEQ(filter: any): boolean { // the procedure for checking LT, GT, and EQ is the same
 		if (!this.isQueryObject(filter)) { // check if it is a valid object
 			return false;
@@ -123,6 +136,7 @@ export default class ValidateHelper {
 			return this.validateNumberType(Object.keys(filter)[0]); // validate if the key for example courses_avg is valid
 		}
 	}
+
 	public validateAND(filter: any): boolean { // validate AND, goes to recurrsion since the body after AND will have length 1 or more
 		if (!(filter instanceof Array)) { // needs to be an array otherwise false
 			return false;
@@ -137,6 +151,7 @@ export default class ValidateHelper {
 			return true;
 		}
 	}
+
 	public validateOR(filter: any): boolean { // Validate for OR, checking inner OR functions
 		if (!(filter instanceof Array)) {
 			return false;
@@ -152,9 +167,11 @@ export default class ValidateHelper {
 		}
 		return true;
 	}
+
 	public validateNOT(filter: any): boolean {
 		return this.validateRestWhereFilters(filter);
 	}
+
 	public validateIS(filter: any): boolean {
 		if (!this.isQueryObject(filter)) {
 			return false;
@@ -168,6 +185,7 @@ export default class ValidateHelper {
 			return this.validateRegType(Object.values(filter)[0]);
 		}
 	}
+
 	public validateRestWhereFilters(rest: any): boolean {
 		let listFilter: string[] = ["LT", "GT", "EQ", "AND", "OR", "NOT", "IS"];
 		if (!this.isQueryObject(rest)) {
@@ -180,6 +198,7 @@ export default class ValidateHelper {
 			return this.validateInnerFilter(rest); // check inner filter
 		}
 	}
+
 	public validateNumberType(filter: any): boolean { // need revision for formatting
 		if (!this.validateIDFormat(filter)) {
 			return false;
@@ -187,8 +206,10 @@ export default class ValidateHelper {
 		let array: string[];
 		array = filter.split("_");
 		if (this.whereCourseMathField.includes(array[1])) {
-			if (this.isCourseQuery) {
-			} else if (this.isCourseQuery === false) {
+			// if (this.isCourseQuery) {
+			// }
+			// else
+			if (this.isCourseQuery === false) {
 				if (this.isRoomQuery === false) {
 					this.isCourseQuery = true;
 				} else {
@@ -196,8 +217,9 @@ export default class ValidateHelper {
 				}
 			}
 		} else if (this.whereRoomMathField.includes(array[1])){
-			if (this.isRoomQuery) {
-			} else if (this.isRoomQuery === false) {
+			// if (this.isRoomQuery) {
+			// } else
+			if (this.isRoomQuery === false) {
 				if (this.isCourseQuery === false) {
 					this.isRoomQuery = true;
 				} else {
@@ -209,6 +231,7 @@ export default class ValidateHelper {
 		}
 		return this.validateDataSetID(array[0]);
 	}
+
 	public validateIDFormat(filter: any): boolean { // need revision for formatting
 		let array: string[];
 		array = filter.split("_");
@@ -221,6 +244,7 @@ export default class ValidateHelper {
 			return true;
 		}
 	}
+
 	public validateDataSetID(id: string): boolean {
 		if (this.queryID === "") { // no ID has been verified against yet
 			this.queryID = id;
@@ -233,6 +257,7 @@ export default class ValidateHelper {
 			}
 		}
 	}
+
 	public validateStringType(filter: any): boolean {
 		if (this.validateIDFormat(filter) === false) {
 			return false;
@@ -243,8 +268,7 @@ export default class ValidateHelper {
 			return false;
 		}
 		if (this.whereCourseStringField.includes(array[1])) {
-			if (this.isCourseQuery) {
-			} else if (this.isCourseQuery === false) {
+			if (this.isCourseQuery === false) {
 				if (this.isRoomQuery === false) {
 					this.isCourseQuery = true;
 				} else {
@@ -252,8 +276,7 @@ export default class ValidateHelper {
 				}
 			}
 		} else if (this.whereRoomStringField.includes(array[1])){
-			if (this.isRoomQuery) {
-			} else if (this.isRoomQuery === false) {
+			if (this.isRoomQuery === false) {
 				if (this.isCourseQuery === false) {
 					this.isRoomQuery = true;
 				} else {
@@ -265,10 +288,12 @@ export default class ValidateHelper {
 		}
 		return this.validateDataSetID(array[0]);
 	}
+
 	public validateRegType(regex: any): boolean {
 		let expression = /^(\*){0,1}[^*]*(\*){0,1}$/;// can have * in the beginning or end, but not in the middle
 		return expression.test(regex);
 	}
+
 	public validateOptionsField(option: any): boolean {
 		if (!this.isQueryObject(option)) {
 			return false;
@@ -293,6 +318,7 @@ export default class ValidateHelper {
 			return false;
 		}
 	}
+
 	public validateColumnField(column: any): boolean {
 		if (!(column instanceof Array)) {
 			return false;
@@ -309,11 +335,14 @@ export default class ValidateHelper {
 						} else {
 							return false; // there is duplicate in naming
 						}
-					} return false;
+					}
+					return false;
 				}
 			}
-		} return true;
+		}
+		return true;
 	}
+
 	public validateAttribute(attribute: any): boolean {
 		if (!(typeof attribute === "string")) {
 			return false;
@@ -332,11 +361,14 @@ export default class ValidateHelper {
 			}
 		}
 	}
+
 	public checkIfIDandAddAttributeToColumn(array: any[]): boolean {
 		if (this.validateDataSetID(array[0])) {
-			if (this.isCourseQuery && (this.whereCourseMathField.includes(array[1]) || this.whereCourseStringField.includes(array[1]))) {
+			if (this.isCourseQuery && (this.whereCourseMathField.includes(array[1]) ||
+				this.whereCourseStringField.includes(array[1]))) {
 				return true;
-			} else if (this.isRoomQuery && (this.whereRoomMathField.includes(array[1]) || this.whereRoomStringField.includes(array[1]))) {
+			} else if (this.isRoomQuery && (this.whereRoomMathField.includes(array[1]) ||
+				this.whereRoomStringField.includes(array[1]))) {
 				return true;
 			} else {
 				return false;
@@ -345,17 +377,20 @@ export default class ValidateHelper {
 			return false;
 		}
 	}
+
 	public validateOrderField(order: any): boolean {
 		// if (typeof order === "string") { // should now be an array
 		if (order instanceof Array) { // do we must have it be length of 2? or can it be one?
-			if ((Object.keys(order).length === 2) && (Object.keys(order)[0] === "dir" && Object.keys(order)[1] === "keys")) {
+			if ((Object.keys(order).length === 2) && (Object.keys(order)[0] === "dir"
+				&& Object.keys(order)[1] === "keys")) {
 				if (!this.validateOrderDir(Object.values(order)[0])) {
 					return false;
 				}
 				if (!this.validateOrderKeys(Object.values(order)[1])) {
 					return false;
 				}
-			} this.requiresOrder = true;
+			}
+			this.requiresOrder = true;
 			return true;
 		} else if (typeof order === "string") {
 			if (this.transformationColumn.includes(order)) {
@@ -375,20 +410,22 @@ export default class ValidateHelper {
 			this.requiresOrder = true; // means that sorting is required in execution
 			this.orderBy.push(array[1]);
 			return ret;
-		}
-		else {
-			return false;
-		}
-	}
-	public validateOrderDir (dir: any): boolean {
-		if (typeof dir === "string") {
-			if (dir === "UP" || dir === "DOWN") {
-				return true;
-			} return false;
 		} else {
 			return false;
 		}
 	}
+
+	public validateOrderDir (dir: any): boolean {
+		if (typeof dir === "string") {
+			if (dir === "UP" || dir === "DOWN") {
+				return true;
+			}
+			return false;
+		} else {
+			return false;
+		}
+	}
+
 	public validateOrderKeys (keys: any): boolean {
 		if (keys instanceof Array) {
 			for (let singleKey of keys) {
@@ -414,6 +451,7 @@ export default class ValidateHelper {
 			}
 		} else {
 			return false;
-		} return true; // reach here if all keys are within columnField
+		}
+		return true; // reach here if all keys are within columnField
 	}
 }
