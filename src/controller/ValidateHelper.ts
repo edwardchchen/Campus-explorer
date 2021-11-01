@@ -1,59 +1,67 @@
 /* eslint-disable */
+import ValidateTransformation from "./ValidateTransformation";
 export default class ValidateHelper {
-	private whereMathField: string[] = ["avg", "pass", "fail", "audit", "year"];
-	private whereStringField: string[] = ["dept", "id", "instructor", "title", "uuid"];
+	public whereCourseMathField: string[] = ["avg", "pass", "fail", "audit", "year"];
+	public whereCourseStringField: string[] = ["dept", "id", "instructor", "title", "uuid"];
+	public whereRoomMathField: string[] = ["lat", "lon", "seats"];
+	public whereRoomStringField: string[] = ["fullname", "shortname", "number", "name", "address", "type", "furniture", "href"];
+	public isRoomQuery: boolean = false;
+	public isCourseQuery: boolean = false;
 	private queryID: string;
 	private result: boolean; // result for the validateAllQuery
-	public columnField: string[];
+	public allColumnField: string[] = []; // all columns include both Transformation and DataSet Columns
+	public dataSetField: string[] = [];
+	public transformationColumn: string[]; // there can be more than one transformation attributes but they all have to appear in Transformation
 	public requiresOrder: boolean;
-	public orderBy: string = ""; // Order by records which column will be sorted after determined valid
+	public orderBy: string[] = []; // Order by records which column will be sorted after determined valid
+	public requireTransformation: boolean;
+	public validateTransformation: ValidateTransformation;
 	constructor() {
 		this.result = true;
 		this.queryID = "";
-		this.columnField = [];
 		this.requiresOrder = false;
+		this.transformationColumn = [];
+		this.requireTransformation = false;
+		this.validateTransformation = new ValidateTransformation();
 	}
 	public findID(): string {
 		return this.queryID;
 	}
 	public validateAllQuery(query: any): boolean {
 		if (this.isQueryObject(query) === false) { // check if the object is undefined or null
-			this.result = false;
+			return false;
 		} else if (Object.keys(query).length < 1) { // meaning the object is empty
 			return false;
 		}
 		if (this.hasValidFields(query) === false) { // has correct length of 1 and has WHERE and OPTION fields
-			this.result = false;
+			return false;
 		}
 		if (this.validateWhereField(query["WHERE"]) === false) { // goes to check WHERE field
-			this.result = false;
+			return false;
 		}
 		if (this.validateOptionsField(query["OPTIONS"]) === false) { // goes to check OPTIONS field
-			this.result = false;
+			return false;
 		}
-		return this.result; // result should be true by default unless set to false by one of the above reasons
+		if (this.requireTransformation) {
+			if (!this.validateTransformationField(query["TRANSFORMATIONS"])) {
+				return false
+			}
+		}
+		return true; // result should be true by default unless set to false by one of the above reasons
+	}
+	public validateTransformationField(query: any): boolean {
+		return this.validateTransformation.validateAllTransformation(query, this);
 	}
 	public hasValidFields(query: any): boolean {
-		if (this.hasCorrectLength(query) === false) { // check if the length of root level field = 2
-			return false;
-		}
-		if (this.hasCorrectRootFields(query) === false) { // check if the fields are WHERE and OPTIONS respectively
-			return false;
-		}
-		return true;
-	}
-	public hasCorrectRootFields(query: any): boolean { // check if the fields are WHERE and OPTIONS respectively
-		if (Object.keys(query)[0] !== "WHERE" || Object.keys(query)[1] !== "OPTIONS") {
-			return false;
-		} else {
+		if ((Object.keys(query).length === 2) &&
+			(Object.keys(query)[0] === "WHERE" && Object.keys(query)[1] === "OPTIONS")) {
 			return true;
-		}
-	}
-	public hasCorrectLength(query: any): boolean { // check if length is equaled to 2, since WHERE + OPTION = 2
-		if (Object.keys(query).length !== 2) {
-			return false;
-		} else {
+		} else if ((Object.keys(query).length === 2) &&
+			(Object.keys(query)[0] === "WHERE" && Object.keys(query)[1] === "OPTIONS" && Object.keys(query)[2] === "TRANSFORMATIONS")) {
+			this.requireTransformation = true;
 			return true;
+		} else {
+			return false;
 		}
 	}
 	public isQueryObject(object: any): boolean { // check if the query is a valid object
@@ -178,10 +186,25 @@ export default class ValidateHelper {
 		}
 		let array: string[];
 		array = filter.split("_");
-		if (array.length === 1) {
-			return false;
-		}
-		if (!this.whereMathField.includes(array[1])) {
+		if (this.whereCourseMathField.includes(array[1])) {
+			if (this.isCourseQuery) {
+			} else if (this.isCourseQuery === false) {
+				if (this.isRoomQuery === false) {
+					this.isCourseQuery = true;
+				} else {
+					return false;
+				}
+			}
+		} else if (this.whereRoomMathField.includes(array[1])){
+			if (this.isRoomQuery) {
+			} else if (this.isRoomQuery === false) {
+				if (this.isCourseQuery === false) {
+					this.isRoomQuery = true;
+				} else {
+					return false;
+				}
+			}
+		} else { // when both room and course don't have this attribute
 			return false;
 		}
 		return this.validateDataSetID(array[0]);
@@ -202,15 +225,12 @@ export default class ValidateHelper {
 		if (this.queryID === "") { // no ID has been verified against yet
 			this.queryID = id;
 			return true;
-		} else if (this.queryID !== "") { // an ID exist but has to match the same queryID
+		} else { // an ID exist but has to match the same queryID
 			if (this.queryID !== id) {
-				this.result = false;
 				return false;
 			} else {
 				return true;
 			}
-		} else {
-			return true;
 		}
 	}
 	public validateStringType(filter: any): boolean {
@@ -222,11 +242,28 @@ export default class ValidateHelper {
 		if (array.length === 1) {
 			return false;
 		}
-		if (!this.whereStringField.includes(array[1])) {
+		if (this.whereCourseStringField.includes(array[1])) {
+			if (this.isCourseQuery) {
+			} else if (this.isCourseQuery === false) {
+				if (this.isRoomQuery === false) {
+					this.isCourseQuery = true;
+				} else {
+					return false;
+				}
+			}
+		} else if (this.whereRoomStringField.includes(array[1])){
+			if (this.isRoomQuery) {
+			} else if (this.isRoomQuery === false) {
+				if (this.isCourseQuery === false) {
+					this.isRoomQuery = true;
+				} else {
+					return false;
+				}
+			}
+		} else { // when both room and course don't have this attribute
 			return false;
-		} else {
-			return this.validateDataSetID(array[0]);
 		}
+		return this.validateDataSetID(array[0]);
 	}
 	public validateRegType(regex: any): boolean {
 		let expression = /^(\*){0,1}[^*]*(\*){0,1}$/;// can have * in the beginning or end, but not in the middle
@@ -255,7 +292,6 @@ export default class ValidateHelper {
 		} else {
 			return false;
 		}
-		return false; // shouldn't reach here
 	}
 	public validateColumnField(column: any): boolean {
 		if (!(column instanceof Array)) {
@@ -265,11 +301,18 @@ export default class ValidateHelper {
 		} else {
 			for (let singleAttribute of Object.values(column)) {
 				if (!this.validateAttribute(singleAttribute)) {
-					return false;
+					if (this.requireTransformation) {
+						if (!this.transformationColumn.includes(singleAttribute)) {
+							this.transformationColumn.push(singleAttribute);
+							this.allColumnField.push(singleAttribute); // pushing the unrecognizable attribute into columnField for future use
+							return true;
+						} else {
+							return false; // there is duplicate in naming
+						}
+					} return false;
 				}
 			}
-		}
-		return true;
+		} return true;
 	}
 	public validateAttribute(attribute: any): boolean {
 		if (!(typeof attribute === "string")) {
@@ -280,8 +323,9 @@ export default class ValidateHelper {
 		if (array.length !== 2) {
 			return false;
 		} else {
-			if (this.checkIfIDandAddAttributeToColumn(array)) {
-				this.columnField.push(array[1]);
+			if (this.checkIfIDandAddAttributeToColumn(array)) { // this can filter the ROOM and COURSE queries
+				this.allColumnField.push(array[1]);
+				this.dataSetField.push(array[1]);
 				return true;
 			} else {
 				return false;
@@ -290,7 +334,9 @@ export default class ValidateHelper {
 	}
 	public checkIfIDandAddAttributeToColumn(array: any[]): boolean {
 		if (this.validateDataSetID(array[0])) {
-			if (this.whereMathField.includes(array[1]) || this.whereStringField.includes(array[1])) {
+			if (this.isCourseQuery && (this.whereCourseMathField.includes(array[1]) || this.whereCourseStringField.includes(array[1]))) {
+				return true;
+			} else if (this.isRoomQuery && (this.whereRoomMathField.includes(array[1]) || this.whereRoomStringField.includes(array[1]))) {
 				return true;
 			} else {
 				return false;
@@ -300,15 +346,74 @@ export default class ValidateHelper {
 		}
 	}
 	public validateOrderField(order: any): boolean {
-		if (typeof order === "string") {
+		// if (typeof order === "string") { // should now be an array
+		if (order instanceof Array) { // do we must have it be length of 2? or can it be one?
+			if ((Object.keys(order).length === 2) && (Object.keys(order)[0] === "dir" && Object.keys(order)[1] === "keys")) {
+				if (!this.validateOrderDir(Object.values(order)[0])) {
+					return false;
+				}
+				if (!this.validateOrderKeys(Object.values(order)[1])) {
+					return false;
+				}
+			} this.requiresOrder = true;
+			return true;
+		} else if (typeof order === "string") {
+			if (this.transformationColumn.includes(order)) {
+				this.requiresOrder = true;
+				this.orderBy.push(order);
+				return true;
+			}
 			let array: string[];
 			array = order.split("_");
-			let ret: boolean = this.columnField.includes(array[1]);
+			if (array.length !== 2) {
+				return false;
+			}
+			if (!this.validateDataSetID(array[0])) {
+				return false;
+			}
+			let ret: boolean = this.dataSetField.includes(array[1]);
 			this.requiresOrder = true; // means that sorting is required in execution
-			this.orderBy = array[1];
+			this.orderBy.push(array[1]);
 			return ret;
+		}
+		else {
+			return false;
+		}
+	}
+	public validateOrderDir (dir: any): boolean {
+		if (typeof dir === "string") {
+			if (dir === "UP" || dir === "DOWN") {
+				return true;
+			} return false;
 		} else {
 			return false;
 		}
+	}
+	public validateOrderKeys (keys: any): boolean {
+		if (keys instanceof Array) {
+			for (let singleKey of keys) {
+				if (this.transformationColumn.includes(singleKey)){
+					this.requiresOrder = true;
+					this.orderBy.push(singleKey);
+				} else {
+					let array: string[];
+					array = singleKey.split("_");
+					if (array.length !== 2) {
+						return false;
+					}
+					if (!this.validateDataSetID(array[0])) {
+						return false;
+					}
+					let ret: boolean = this.dataSetField.includes(array[1]);
+					this.requiresOrder = true; // means that sorting is required in execution
+					this.orderBy.push(array[1]);
+					if (!ret) {
+						return false;
+					}
+				}
+			}
+		} else {
+			return false;
+		} return true; // reach here if all keys are within columnField
 	}
 }
