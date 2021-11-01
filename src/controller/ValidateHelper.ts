@@ -45,7 +45,7 @@ export default class ValidateHelper {
 		if (!this.validateWhereField(query["WHERE"])) { // goes to check WHERE field
 			return false;
 		}
-		if (!this.validateHelperHelper.validateOptionsField(this, query["OPTIONS"])){
+		if (!this.validateHelperHelper.validateOptionsField(query["OPTIONS"], this)) {
 			return false;
 		}
 		// if (!this.validateOptionsField(query["OPTIONS"])) { // goes to check OPTIONS field

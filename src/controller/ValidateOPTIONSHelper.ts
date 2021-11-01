@@ -2,9 +2,6 @@ import ValidateHelper from "./ValidateHelper";
 
 export default class ValidateOPTIONSHelper {
 	public validateHelperTemp: ValidateHelper;
-	constructor() {
-		this.validateHelperTemp = new ValidateHelper();
-	}
 
 	public isQueryObject(object: any): boolean { // check if the query is a valid object
 		if (typeof object !== "object") { // should be an object
