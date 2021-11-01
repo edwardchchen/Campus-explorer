@@ -21,6 +21,7 @@ export default class QueryEngine {
 		this.roomQueryExecuteHelper = new RoomQueryExecuteHelper();
 		this.tempDataStore = new DataStore();
 	}
+
 	public runQuery(query: any, localDataStore: any): Promise<any[]> { // return the list of InsightFacade
 		if (this.queryValidate(query)) {
 			this.tempDataStore = localDataStore;
@@ -50,9 +51,11 @@ export default class QueryEngine {
 		}
 		return Promise.reject(new InsightError());
 	}
+
 	private queryValidate(query: any): boolean {
 		return this.validateHelper.validateAllQuery(query);
 	}
+
 	private validateCourseIDwithDataSet(id: string): boolean {
 		for (let singleInsightFacade of this.tempDataStore.dataSets) {
 			if ((singleInsightFacade.kind === InsightDatasetKind.Courses) && (singleInsightFacade.id === id)) {
@@ -70,6 +73,7 @@ export default class QueryEngine {
 		}
 		return false; // none of the IDs match with this criteria
 	}
+
 	private courseQueryExecute(id: string, courseDataSet: any, query: any): Promise<any>{ // should return an array with correct result
 		return this.courseQueryExecuteHelper.executeAndOrder(id, courseDataSet, this.validateHelper, query);
 	}

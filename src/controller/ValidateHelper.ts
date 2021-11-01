@@ -11,7 +11,7 @@ export default class ValidateHelper {
 	private result: boolean; // result for the validateAllQuery
 	public allColumnField: string[] = []; // all columns include both Transformation and DataSet Columns
 	public dataSetField: string[] = [];
-	public transformationColumn: string[]; // there can be more than one transformation attributes but they all have to appear in Transformation
+	public transformationColumn: string[] = []; // there can be more than one transformation attributes but they all have to appear in Transformation
 	public requiresOrder: boolean;
 	public orderBy: string[] = []; // Order by records which column will be sorted after determined valid
 	public requireTransformation: boolean;

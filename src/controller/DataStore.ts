@@ -14,6 +14,7 @@ export default class DataStore{
 	constructor() {
 		this.dataSets = [];
 	}
+
 	private static isValidJson(json: string): boolean {
 		try {
 			JSON.parse(json);
@@ -21,8 +22,6 @@ export default class DataStore{
 			return false;
 		}
 		return JSON.parse(json).result.length > 0;
-
-
 	}
 
 	private static isValidCourse(course: any): boolean {
@@ -31,6 +30,7 @@ export default class DataStore{
 			&& course.Fail !== null && course.Audit !== null && course.id !== null && course.Year !== null;
 
 	}
+
 	private static convertJsonCourseIntoCourse(course: any) {
 		if(DataStore.isValidCourse(course)){
 			const c: Course = {
@@ -51,11 +51,13 @@ export default class DataStore{
 		return null;
 
 	}
+
 	private static isIdInvalid(id: string){
 		let whiteSpaceRegex = new RegExp("[\\s]");
 		let underscoreRegex = new RegExp("[_]");
 		return whiteSpaceRegex.test(id) || underscoreRegex.test(id);
 	}
+
 	private isInValid(id: string,kind: InsightDatasetKind){
 		if(DataStore.isIdInvalid(id)) {
 			return true;
@@ -79,6 +81,7 @@ export default class DataStore{
 		});
 		return locationNameSet;
 	}
+
 	private extractRooms(data: string): Room[]{
 		let res: Room[] = [];
 		const roomInfo = data.slice( data.indexOf( "<tbody>" ) + 8,data.indexOf( "</tbody>"));
@@ -99,7 +102,8 @@ export default class DataStore{
 				name = name.replace("-","_");
 				number = name.substr(name.indexOf("_") + 1,name.length);
 				shortname = name.substr(0,name.indexOf("_"));
-			}if(parsed[i + 1].nodeName === "#text"){
+			}
+			if(parsed[i + 1].nodeName === "#text"){
 				let text = parsed[i + 1].value;
 				text = text.replace(/(\r\n|\n|\r)/gm, "");
 				let splitted = text.split("  ");
@@ -116,6 +120,7 @@ export default class DataStore{
 		}
 		return res;
 	}
+
 	private static convertIntoRoom(fullname: string, shortname: string, number: string, name: string, address: string,
 		seats: number, type: string, furniture: string, href: string): Room{
 		return {
@@ -133,6 +138,7 @@ export default class DataStore{
 		};
 
 	}
+
 	private callApi(roomArray: Room[]): any {
 		const promises: any[] = [];
 		if(roomArray.length > 0) {
@@ -172,20 +178,20 @@ export default class DataStore{
 					.then((data: string[]) => {
 						// return this.callApi(this.extractRooms(data[10]));
 						let rooms: Room[] = [];
-						data.forEach((value)=>{
+						for (const value of data) {
 							if(value !== ""){
 								rooms.push(...this.extractRooms(value));
 							}
-						});
+						}
 						if(data.length === 0){
 							return Promise.reject(new InsightError());
 						}
 						this.roomMap.set(id,rooms);
 						this.dataSets.push({id:id,kind:kind,numRows:rooms.length});
 						let existingKeys: string[] = [];
-						this.dataSets.forEach(function(val){
-							existingKeys.push(val.id);
-						});
+						for (const value of this.dataSets) {
+							existingKeys.push(value.id);
+						}
 						return existingKeys;
 					});
 			}).catch((e)=>{
@@ -193,6 +199,18 @@ export default class DataStore{
 			}).then((res: any)=>{
 				return Promise.resolve(res);
 			});
+	}
+
+	private addHelper(value: any,jsonArray: any){
+		if(DataStore.isValidJson(value)) {
+			let courseArray = JSON.parse(value).result;
+			courseArray.forEach((course: any) => {
+				let parsed = DataStore.convertJsonCourseIntoCourse(course);
+				if(parsed !== null){
+					jsonArray.push(parsed);
+				}
+			});
+		}
 	}
 
 	public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
@@ -211,27 +229,18 @@ export default class DataStore{
 				return Promise.all(promises)
 					.then((data) => {
 						let jsonArray: Course[] = [];
-						data.forEach((value) => {
-
-							if(DataStore.isValidJson(value)) {
-								let courseArray = JSON.parse(value).result;
-								courseArray.forEach((course: any) => {
-									let parsed = DataStore.convertJsonCourseIntoCourse(course);
-									if(parsed !== null){
-										jsonArray.push(parsed);
-									}
-								});
-							}
-						});
+						for(const value of data){
+							this.addHelper(value,jsonArray);
+						}
 						if(jsonArray.length === 0){
 							return Promise.reject(new InsightError());
 						}
 						this.dataMap.set(id,jsonArray);
 						this.dataSets.push({id:id,kind:kind,numRows:jsonArray.length});
 						let existingKeys: string[] = [];
-						this.dataSets.forEach(function(val){
-							existingKeys.push(val.id);
-						});
+						for(const value of this.dataSets){
+							existingKeys.push(value.id);
+						}
 						return existingKeys;
 					});
 			}).catch((e)=>{
@@ -240,11 +249,12 @@ export default class DataStore{
 				return Promise.resolve(res);
 			});
 	}
+
 	public removeDataset(id: string): Promise<string> {
 		if(DataStore.isIdInvalid(id)){
 			return Promise.reject(new InsightError("Invalid Id"));
 		}
-		if(!this.dataMap.get(id)){
+		if(!this.dataMap.get(id) && !this.roomMap.get(id) ){
 			return Promise.reject(new NotFoundError());
 		}
 		for(let  i = 0;i < this.dataSets.length;i++){
@@ -254,6 +264,9 @@ export default class DataStore{
 			}
 		}
 		if(this.dataMap.delete(id)){
+			return Promise.resolve(id);
+		}
+		if(this.roomMap.delete(id)){
 			return Promise.resolve(id);
 		}
 		return Promise.reject(new NotFoundError());

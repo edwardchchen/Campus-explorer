@@ -74,6 +74,7 @@ export default class ValidateTransformation {
 			return false;
 		}
 	}
+
 	public validateAttribute(attribute: any): boolean {
 		if (!(typeof attribute === "string")) {
 			return false;
@@ -94,6 +95,7 @@ export default class ValidateTransformation {
 			}
 		}
 	}
+
 	public validateApply(apply: any): boolean {
 		if (apply instanceof Array) {
 			if (apply.length === 0) {
@@ -103,7 +105,8 @@ export default class ValidateTransformation {
 				if (this.validateInnerApplyColumn(singleApplyColumn) === false) {
 					return false; // The applykeys should be in Transformation column
 				}
-			} return true;
+			}
+			return true;
 		} else {
 			return false;
 		}
@@ -173,6 +176,7 @@ export default class ValidateTransformation {
 			}
 		}
 	}
+
 	public validateCountAttribute (attribute: any): boolean {
 		if (!(typeof attribute === "string")) {
 			return false;

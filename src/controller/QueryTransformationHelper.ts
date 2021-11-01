@@ -81,6 +81,7 @@ export default class QueryTransformationHelper {
 		});
 		return groupByData;
 	}
+
 	private calculateMax (singleArray: any[], key: string): number {
 		let Max: number = -1; // we are assuming that the array will have at least length 1
 		for (let singleCourse of singleArray) {
@@ -118,6 +119,7 @@ export default class QueryTransformationHelper {
 		}
 		return Number(total.toFixed(2));
 	}
+
 	private calculateCount (singleArray: any[], key: string): number {
 		let countObject: {[value: string]: any};
 		countObject = {};
@@ -129,6 +131,7 @@ export default class QueryTransformationHelper {
 		let result: number = Object.entries(countObject).length;
 		return result;
 	}
+
 	private applyKeyCalculation(applyKeyType: string, applyKeyField: string, singleArray: any[]): number {
 		if (applyKeyType === "COUNT") {
 			return this.calculateCount(singleArray, applyKeyField);

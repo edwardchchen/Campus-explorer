@@ -61,6 +61,7 @@ export default class CourseQueryExecuteHelper {
 			return Promise.reject(new InsightError());
 		}
 	}
+
 	private addIdIntoFields(courses: Course[]): Course[]{
 		let keys: string[];
 		let oldKeys: string[];
@@ -95,7 +96,8 @@ export default class CourseQueryExecuteHelper {
 		for (let keys of innerLTStatement) {
 			let tempDataset = this.filterEachCourse(keys, curDataSet);
 			combinedDataset = [...tempDataset, ...combinedDataset]; // destructuring and combining without duplicate
-		} return combinedDataset;
+		}
+		return combinedDataset;
 	}
 
 	private NOTHelper (queryField: any, curDataSet: Course[], innerLTStatement: any): Course[] {
@@ -142,7 +144,8 @@ export default class CourseQueryExecuteHelper {
 					this.deleteField(copiedSingleCourse); // make sure it is the copied course
 					filteredListCourses.push(copiedSingleCourse);
 				}
-			} return filteredListCourses;
+			}
+			return filteredListCourses;
 		} else if (key === "EQ") {
 			for (let singleCourse of curDataSet) {
 				if (singleCourse[attribute] === num) {
@@ -151,15 +154,18 @@ export default class CourseQueryExecuteHelper {
 					this.deleteField(copiedSingleCourse); // make sure it is the copied course
 					filteredListCourses.push(copiedSingleCourse);
 				}
-			} return filteredListCourses;
+			}
+			return filteredListCourses;
 		} else if (key === "GT") {
-			for (let singleCourse of curDataSet) {
-				if (singleCourse[attribute] > num) {
-					let copiedSingleCourse: Course = singleCourse;
-					this.deleteField(copiedSingleCourse);
-					filteredListCourses.push(copiedSingleCourse);
-				}
-			} return filteredListCourses;
+			return this.GTHelper(curDataSet,attribute,num,filteredListCourses);
+			// for (let singleCourse of curDataSet) {
+			// 	if (singleCourse[attribute] > num) {
+			// 		let copiedSingleCourse: Course = singleCourse;
+			// 		this.deleteField(copiedSingleCourse);
+			// 		filteredListCourses.push(copiedSingleCourse);
+			// 	}
+			// }
+			// return filteredListCourses;
 		} else { // (key === "LT")
 			for (let singleCourse of curDataSet) {
 				if (singleCourse[attribute] < num) {
@@ -167,8 +173,21 @@ export default class CourseQueryExecuteHelper {
 					this.deleteField(copiedSingleCourse); // make sure it is the copied course
 					filteredListCourses.push(copiedSingleCourse);
 				}
-			} return filteredListCourses;
+			}
+			return filteredListCourses;
 		}
+	}
+
+	private GTHelper(curDataSet: any,attribute: any,num: any,filteredListCourses: any): any{
+		for (let singleCourse of curDataSet) {
+			if (singleCourse[attribute] > num) {
+				let copiedSingleCourse: Course = singleCourse;
+				this.deleteField(copiedSingleCourse);
+				filteredListCourses.push(copiedSingleCourse);
+			}
+		}
+		return filteredListCourses;
+
 	}
 
 	private deleteField(course: Course): void { // delete the fields in a course that are not specified in OPTIONS

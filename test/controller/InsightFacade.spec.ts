@@ -1,4 +1,9 @@
-import {InsightDatasetKind, InsightError, ResultTooLargeError} from "../../src/controller/IInsightFacade";
+import {
+	InsightDataset,
+	InsightDatasetKind,
+	InsightError,
+	ResultTooLargeError
+} from "../../src/controller/IInsightFacade";
 import InsightFacade from "../../src/controller/InsightFacade";
 
 import * as fs from "fs-extra";
@@ -71,6 +76,23 @@ describe("InsightFacade", function () {
 			return insightFacade.addDataset(id, content, InsightDatasetKind.Rooms).then((result: string[]) => {
 				expect(result).to.deep.equal(expected);
 			});
+		});
+		it("it should return 2 datasets", function (){
+			const content: string = datasetContents.get("rooms") ?? "";
+
+			this.timeout(5000);
+			return insightFacade.addDataset("courses", content, InsightDatasetKind.Rooms)
+				.then((res: string[])=>{
+					return insightFacade.addDataset("courses1", content, InsightDatasetKind.Rooms);
+				}).then((res: string[])=>{
+					return insightFacade.listDatasets();
+				}).then((res: InsightDataset[])=>{
+					return res;
+				}).then((res: InsightDataset[])=>{
+					expect(res.length).equals(2);
+				}).catch((e)=>{
+					expect.fail();
+				});
 		});
 
 	});
