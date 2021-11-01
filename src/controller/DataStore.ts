@@ -177,12 +177,17 @@ export default class DataStore{
 								rooms.push(...this.extractRooms(value));
 							}
 						});
-						console.log(this.requiredBuildings);
-						// console.log(rooms);
-					}).then((data: any) => {
-						console.log(data[0]);
+						if(data.length === 0){
+							return Promise.reject(new InsightError());
+						}
+						this.roomMap.set(id,rooms);
+						this.dataSets.push({id:id,kind:kind,numRows:rooms.length});
+						let existingKeys: string[] = [];
+						this.dataSets.forEach(function(val){
+							existingKeys.push(val.id);
+						});
+						return existingKeys;
 					});
-
 			}).catch((e)=>{
 				return Promise.reject(new InsightError());
 			}).then((res: any)=>{
