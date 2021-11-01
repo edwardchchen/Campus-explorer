@@ -15,10 +15,10 @@ export default class RoomQueryExecuteHelper {
 	// private filteredListofCourses: any[] = [];
 	private filteredDataset: Course[];
 	private id: string;
-	private validateHelper: ValidateHelper;
-	private columnRequiredToBeRemoved: string[];
+	private validateHelper!: ValidateHelper;
+	private columnRequiredToBeRemoved!: string[];
 	private passedInDataset: Course[];
-	private transformationHelper: QueryTransformationHelper;
+	private transformationHelper!: QueryTransformationHelper;
 
 
 	constructor() {

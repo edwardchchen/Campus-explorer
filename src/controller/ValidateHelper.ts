@@ -17,8 +17,8 @@ export default class ValidateHelper {
 	public requiresOrder: boolean;
 	public orderBy: string[] = []; // Order by records which column will be sorted after determined valid
 	public requireTransformation: boolean;
-	public validateTransformation: ValidateTransformation;
-	public validateHelperHelper: ValidateOPTIONSHelper;
+	public validateTransformation!: ValidateTransformation;
+	public validateHelperHelper!: ValidateOPTIONSHelper;
 	constructor() {
 		this.result = true;
 		this.queryID = "";

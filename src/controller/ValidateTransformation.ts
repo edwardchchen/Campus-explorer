@@ -4,7 +4,7 @@ export default class ValidateTransformation {
 
 	public applyMathFields: string[];
 	public applyAllFields: string = "COUNT";
-	public validateHelper: ValidateHelper;
+	public validateHelper!: ValidateHelper;
 	public groupByColumns: string[] = [];
 	public requireCount: boolean = false;
 	public allColumns: string[] = []; // Fields in Groupby and Apply, to be used to check against the allColumn in ValidateHelper

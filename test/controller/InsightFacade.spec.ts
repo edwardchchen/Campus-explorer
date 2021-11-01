@@ -104,8 +104,10 @@ describe("InsightFacade", function () {
 	 * You can still make tests the normal way, this is just a convenient tool for a majority of queries.
 	 */
 	describe("PerformQuery", () => {
+
 		before(function () {
 			console.info(`Before: ${this.test?.parent?.title}`);
+			this.timeout(10000);
 
 			insightFacade = new InsightFacade();
 
@@ -124,7 +126,6 @@ describe("InsightFacade", function () {
 		});
 
 		type PQErrorKind = "ResultTooLargeError" | "InsightError";
-
 		testFolder<any, any[], PQErrorKind>(
 			"Dynamic InsightFacade PerformQuery tests",
 			(input) => insightFacade.performQuery(input),

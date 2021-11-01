@@ -8,8 +8,8 @@ import Decimal from "decimal.js";
 export default class QueryTransformationHelper {
 
 	private passedInDataset: Course[];
-	private groupByMap: Map<string[], Course[]>;
-	private course: Course;
+	private groupByMap!: Map<string[], Course[]>;
+	private course!: Course;
 	private vh: ValidateHelper = new ValidateHelper();
 	private localQuery: any;
 	constructor() {
