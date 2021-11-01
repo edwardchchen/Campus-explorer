@@ -2,7 +2,7 @@ import {InsightDataset, InsightDatasetKind, InsightError, NotFoundError} from ".
 import JSZip from "jszip";
 import {Course} from "./Course";
 import {Room} from "./Room";
-import GeoHelper from "./GeoHelper";
+import GeoHelper, {GeoResponse} from "./GeoHelper";
 
 export default class DataStore{
 	public dataSets: InsightDataset[]
@@ -11,6 +11,8 @@ export default class DataStore{
 	private requiredBuildings: Set<string> = new Set<string>();
 	private parse5 = require("parse5");
 	private geoHelper = new GeoHelper();
+	public addressMap: Map<string, GeoResponse> = new Map<string, GeoResponse>();
+
 	constructor() {
 		this.dataSets = [];
 	}
@@ -139,13 +141,32 @@ export default class DataStore{
 
 	}
 
-	private callApi(roomArray: Room[]): any {
+	public callApi(roomArray: Room[] | undefined): any {
 		const promises: any[] = [];
-		if(roomArray.length > 0) {
-			let address = roomArray[0].address;
-			promises.push(this.geoHelper.findCoordinates(address,null));
+		if(roomArray) {
+			roomArray.forEach((room) => {
+				if (!this.addressMap.get(room.address)) {
+					promises.push(this.geoHelper.findCoordinates(room.address, null));
+				}
+			});
 			return Promise.all(promises).then((data: any) => {
 				return data;
+			}).then((data: any) => {
+				for(const d of data){
+					if(!this.addressMap.get(d.address)){
+						this.addressMap.set(d.address,d);
+					}
+				}
+				for(const room of roomArray){
+					let geo = this.addressMap.get(room.address);
+					if(geo){
+						if(geo.lat && geo.lon){
+							room.lat = geo.lat;
+							room.lon = geo.lon;
+						}
+					}
+				}
+				return Promise.resolve(data);
 			});
 		}
 	}
@@ -176,7 +197,6 @@ export default class DataStore{
 						return Promise.all(roomPromises);
 					})
 					.then((data: string[]) => {
-						// return this.callApi(this.extractRooms(data[10]));
 						let rooms: Room[] = [];
 						for (const value of data) {
 							if(value !== ""){

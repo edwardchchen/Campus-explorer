@@ -26,7 +26,10 @@ export default class InsightFacade implements IInsightFacade {
 	public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
 		if(kind === InsightDatasetKind.Rooms){
 			return Promise.resolve(this.dataStore.addRoomDataset(id, content, kind)).then((r) => {
-				return r;
+				return this.dataStore.callApi(this.dataStore.roomMap.get(id)).then((e: any)=>{
+					return r;
+
+				});
 			});
 		}
 		if(kind === InsightDatasetKind.Courses){

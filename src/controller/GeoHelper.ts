@@ -1,5 +1,6 @@
 import http = require("http");
-interface GeoResponse {
+import {Course} from "./Course";
+export interface GeoResponse {
 	lat?: number;
 	lon?: number;
 	error?: string;
@@ -7,54 +8,12 @@ interface GeoResponse {
 
 
 export default class GeoHelper{
+	public addressMap: Map<string, GeoResponse> = new Map<string, GeoResponse>();
 	private url = "http://cs310.students.cs.ubc.ca:11316/api/v1/project_team127/"
-	// public findCoordinates(address: string): Promise<any> {
-	// 	address = encodeURIComponent(address);
-	// 	let url = this.url + address;
-	// 	console.log(url);
-	// 	return new Promise(function(resolve, reject) {
-	// 		let req = http.request(url, function(res) {
-	// 			let body = "";
-	// 			res.on("data", function(chunk) {
-	// 				body += chunk;
-	// 			});
-	// 			// resolve on end
-	// 			res.on("end", function() {
-	// 				resolve(body);
-	// 			});
-	// 		});
-	// 		// reject on request error
-	// 		req.on("error", function(err) {
-	// 			// This is not a "Second reject", just a different sort of failure
-	// 			console.log("got error gg");
-	// 			reject(err);
-	// 		});
-	// 		// IMPORTANT
-	// 		req.end();
-	// 	});
-	//
-	// 	// address = encodeURIComponent(address);
-	// 	// let url = this.url + address;
-	// 	// console.log(url);
-	// 	// return new Promise(function(resolve, reject) {
-	// 	// 	let req = http.request(url, function(res) {
-	// 	// 		let body = "";
-	// 	// 		res.on("data", function(chunck: any) {
-	// 	// 			body += chunck;
-	// 	// 		});
-	// 	// 		res.on("end", function(){
-	// 	// 			console.log(body);
-	// 	// 			resolve(body);
-	// 	// 		});
-	// 	// 	});
-	// 	// 	req.end();
-	// 	// });
-	// 	//
-	//
-	// }
+	// code from here : https://stackoverflow.com/questions/38533580/nodejs-how-to-promisify-http-request-reject-got-called-two-times
 	public findCoordinates(address: any, postData: any) {
-		address = encodeURIComponent(address);
-		let url = this.url + address;
+		let urladdress = encodeURIComponent(address);
+		let url = this.url + urladdress;
 
 		return new Promise(function(resolve, reject) {
 			let req = http.request(url, function(res: any) {
@@ -74,6 +33,7 @@ export default class GeoHelper{
 					} catch(e) {
 						reject(e);
 					}
+					body["address"] = address;
 					resolve(body);
 				});
 			});
