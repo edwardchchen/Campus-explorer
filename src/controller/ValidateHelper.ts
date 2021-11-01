@@ -32,18 +32,18 @@ export default class ValidateHelper {
 	}
 
 	public validateAllQuery(query: any): boolean {
-		if (this.isQueryObject(query) === false) { // check if the object is undefined or null
+		if (!this.isQueryObject(query)) { // check if the object is undefined or null
 			return false;
 		} else if (Object.keys(query).length < 1) { // meaning the object is empty
 			return false;
 		}
-		if (this.hasValidFields(query) === false) { // has correct length of 1 and has WHERE and OPTION fields
+		if (!this.hasValidFields(query)) { // has correct length of 1 and has WHERE and OPTION fields
 			return false;
 		}
-		if (this.validateWhereField(query["WHERE"]) === false) { // goes to check WHERE field
+		if (!this.validateWhereField(query["WHERE"])) { // goes to check WHERE field
 			return false;
 		}
-		if (this.validateOptionsField(query["OPTIONS"]) === false) { // goes to check OPTIONS field
+		if (!this.validateOptionsField(query["OPTIONS"])) { // goes to check OPTIONS field
 			return false;
 		}
 		if (this.requireTransformation) {
@@ -80,15 +80,11 @@ export default class ValidateHelper {
 			return false;
 		} else if (object === undefined) { // shouldn't be undefined
 			return false;
-		} else if (object === null) { // cannot be a null type
-			return false;
-		} else {
-			return true;
-		}
+		} else return object !== null;
 	}
 
 	public validateWhereField(where: any): boolean { // validate WHERE field with helper functions
-		if (this.isQueryObject(where) === false) { // return false if the format of the inner query is wrong
+		if (!this.isQueryObject(where)) { // return false if the format of the inner query is wrong
 			return false;
 		} else if (Object.keys(where).length < 1) { // if WHERE is empty should be ok and return true and no filter
 			return true;
@@ -144,7 +140,7 @@ export default class ValidateHelper {
 			return false;
 		} else {
 			for (let filters of filter) {
-				if (this.validateRestWhereFilters(filters) === false) {
+				if (!this.validateRestWhereFilters(filters)) {
 					return false;
 				}
 			}
@@ -159,13 +155,12 @@ export default class ValidateHelper {
 			return false;
 		} else {
 			for (let filters of filter) {
-				if (this.validateRestWhereFilters(filters) === false) {
+				if (!this.validateRestWhereFilters(filters)) {
 					return false;
 				}
 			}
 			return true;
 		}
-		return true;
 	}
 
 	public validateNOT(filter: any): boolean {
@@ -177,7 +172,7 @@ export default class ValidateHelper {
 			return false;
 		} else if (Object.keys(filter).length !== 1) { // if more than length 1 means invalid
 			return false;
-		} else if ((this.validateStringType(Object.keys(filter)[0]) === false)) {
+		} else if (!this.validateStringType(Object.keys(filter)[0])) {
 			return false;
 		} else if (typeof Object.values(filter)[0] !== "string") { // if value type isn't a string return false
 			return false;
@@ -206,21 +201,16 @@ export default class ValidateHelper {
 		let array: string[];
 		array = filter.split("_");
 		if (this.whereCourseMathField.includes(array[1])) {
-			// if (this.isCourseQuery) {
-			// }
-			// else
-			if (this.isCourseQuery === false) {
-				if (this.isRoomQuery === false) {
+			if (!this.isCourseQuery) {
+				if (!this.isRoomQuery) {
 					this.isCourseQuery = true;
 				} else {
 					return false;
 				}
 			}
 		} else if (this.whereRoomMathField.includes(array[1])){
-			// if (this.isRoomQuery) {
-			// } else
-			if (this.isRoomQuery === false) {
-				if (this.isCourseQuery === false) {
+			if (!this.isRoomQuery) {
+				if (!this.isCourseQuery) {
 					this.isRoomQuery = true;
 				} else {
 					return false;
@@ -238,11 +228,7 @@ export default class ValidateHelper {
 		if (!(typeof array[0] === "string") && !(typeof array[1] === "string")) {
 			return false;
 		}
-		if (array.length !== 2) {
-			return false;
-		} else {
-			return true;
-		}
+		return array.length === 2;
 	}
 
 	public validateDataSetID(id: string): boolean {
@@ -250,16 +236,12 @@ export default class ValidateHelper {
 			this.queryID = id;
 			return true;
 		} else { // an ID exist but has to match the same queryID
-			if (this.queryID !== id) {
-				return false;
-			} else {
-				return true;
-			}
+			return this.queryID === id;
 		}
 	}
 
 	public validateStringType(filter: any): boolean {
-		if (this.validateIDFormat(filter) === false) {
+		if (!this.validateIDFormat(filter)) {
 			return false;
 		}
 		let array: string[];
@@ -268,16 +250,16 @@ export default class ValidateHelper {
 			return false;
 		}
 		if (this.whereCourseStringField.includes(array[1])) {
-			if (this.isCourseQuery === false) {
-				if (this.isRoomQuery === false) {
+			if (!this.isCourseQuery) {
+				if (!this.isRoomQuery) {
 					this.isCourseQuery = true;
 				} else {
 					return false;
 				}
 			}
 		} else if (this.whereRoomStringField.includes(array[1])){
-			if (this.isRoomQuery === false) {
-				if (this.isCourseQuery === false) {
+			if (!this.isRoomQuery) {
+				if (!this.isCourseQuery) {
 					this.isRoomQuery = true;
 				} else {
 					return false;
@@ -307,13 +289,9 @@ export default class ValidateHelper {
 		} else if (Object.keys(option).length === 2) {
 			if (!(Object.keys(option)[0] === "COLUMNS") || !(Object.keys(option)[1] === "ORDER")) {
 				return false;
-			} else if (this.validateColumnField(Object.values(option)[0]) === false) {
+			} else if (!this.validateColumnField(Object.values(option)[0])) {
 				return false;
-			} else if (this.validateOrderField(Object.values(option)[1]) === false) {
-				return false;
-			} else {
-				return true; // should reach here if all conditions are met
-			}
+			} else return this.validateOrderField(Object.values(option)[1]);
 		} else {
 			return false;
 		}
@@ -367,12 +345,8 @@ export default class ValidateHelper {
 			if (this.isCourseQuery && (this.whereCourseMathField.includes(array[1]) ||
 				this.whereCourseStringField.includes(array[1]))) {
 				return true;
-			} else if (this.isRoomQuery && (this.whereRoomMathField.includes(array[1]) ||
-				this.whereRoomStringField.includes(array[1]))) {
-				return true;
-			} else {
-				return false;
-			}
+			} else return this.isRoomQuery && (this.whereRoomMathField.includes(array[1]) ||
+				this.whereRoomStringField.includes(array[1]));
 		} else {
 			return false;
 		}
@@ -417,10 +391,7 @@ export default class ValidateHelper {
 
 	public validateOrderDir (dir: any): boolean {
 		if (typeof dir === "string") {
-			if (dir === "UP" || dir === "DOWN") {
-				return true;
-			}
-			return false;
+			return dir === "UP" || dir === "DOWN";
 		} else {
 			return false;
 		}
