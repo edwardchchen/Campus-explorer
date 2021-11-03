@@ -16,8 +16,8 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import {Link} from "react-router-dom";
-import EditIcon from '@mui/icons-material/Edit';
-import TableChartIcon from '@mui/icons-material/TableChart';
+import EditIcon from '@material-ui/icons/Edit';
+import TableChartIcon from '@material-ui/icons/TableChart';
 const drawerWidth = 240;
 
 //code modified from material UI's demo on the app bar
@@ -148,12 +148,17 @@ export default function Navbar() {
 				<List>
 					<ListItem component={Link} to="/edit">
 						<ListItemIcon>{<EditIcon />}</ListItemIcon>
-						<ListItemText primary={"Edit Items"} />
+						<ListItemText primary={"Add/Remove Datasets"} />
 					</ListItem>
 					<ListItem component={Link} to="/list">
 						<ListItemIcon>{<TableChartIcon />}</ListItemIcon>
-						<ListItemText primary={"List Items"} />
+						<ListItemText primary={"List Datasets"} />
 					</ListItem>
+					<ListItem component={Link} to="/query">
+						<ListItemIcon>{<EditIcon />}</ListItemIcon>
+						<ListItemText primary={"Query Datasets"} />
+					</ListItem>
+
 				</List>
 			</Drawer>
 			<main className={classes.content}>
