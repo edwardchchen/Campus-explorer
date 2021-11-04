@@ -1,5 +1,5 @@
 import Typography from "@material-ui/core/Typography";
-import {Container} from "@material-ui/core";
+import {Container, Divider} from "@material-ui/core";
 
 export default function ListPage(props){
 	return(
@@ -9,6 +9,8 @@ export default function ListPage(props){
 			>
 				Query
 			</Typography>
+			<Divider/>
+
 		</Container>
 	)
 }
