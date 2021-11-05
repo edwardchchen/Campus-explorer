@@ -13,7 +13,7 @@ export default class CourseQueryExecuteHelper {
 	private filteredDataset: Course[];
 	private id: string;
 	private validateHelper!: ValidateHelper;
-	private columnRequiredToBeRemoved!: string[];
+	private columnRequiredToBeRemoved: string[];
 	private passedInDataset: Course[];
 	private transformationHelper!: QueryTransformationHelper;
 
@@ -23,6 +23,7 @@ export default class CourseQueryExecuteHelper {
 		this.id = "";
 		this.passedInDataset = [];
 		this.transformationHelper = new QueryTransformationHelper();
+		this.columnRequiredToBeRemoved = [];
 	}
 
 	public columnsNotIncluded(): void { // output a list of columns that should be removed in Course due to OPTIONS not specifying them
@@ -140,7 +141,7 @@ export default class CourseQueryExecuteHelper {
 			let Strattribute: string = array[1]; // avg
 			for (let singleCourse of curDataSet) {
 				if (singleCourse[Strattribute] === str) {
-					let copiedSingleCourse: Course = singleCourse;
+					let copiedSingleCourse: Course = JSON.parse(JSON.stringify(singleCourse));
 					this.deleteField(copiedSingleCourse); // make sure it is the copied course
 					filteredListCourses.push(copiedSingleCourse);
 				}
@@ -150,7 +151,7 @@ export default class CourseQueryExecuteHelper {
 			for (let singleCourse of curDataSet) {
 				if (singleCourse[attribute] === num) {
 					// let copiedSingleCourse: Course = singleCourse;
-					let copiedSingleCourse: Course = Object.assign({}, singleCourse);
+					let copiedSingleCourse: Course = JSON.parse(JSON.stringify(singleCourse));
 					this.deleteField(copiedSingleCourse); // make sure it is the copied course
 					filteredListCourses.push(copiedSingleCourse);
 				}
@@ -169,7 +170,7 @@ export default class CourseQueryExecuteHelper {
 		} else { // (key === "LT")
 			for (let singleCourse of curDataSet) {
 				if (singleCourse[attribute] < num) {
-					let copiedSingleCourse: Course = Object.assign({}, singleCourse);
+					let copiedSingleCourse: Course = JSON.parse(JSON.stringify(singleCourse));
 					this.deleteField(copiedSingleCourse); // make sure it is the copied course
 					filteredListCourses.push(copiedSingleCourse);
 				}
@@ -181,7 +182,7 @@ export default class CourseQueryExecuteHelper {
 	private GTHelper(curDataSet: any,attribute: any,num: any,filteredListCourses: any): any{
 		for (let singleCourse of curDataSet) {
 			if (singleCourse[attribute] > num) {
-				let copiedSingleCourse: Course = singleCourse;
+				let copiedSingleCourse: Course = JSON.parse(JSON.stringify(singleCourse));
 				this.deleteField(copiedSingleCourse);
 				filteredListCourses.push(copiedSingleCourse);
 			}
