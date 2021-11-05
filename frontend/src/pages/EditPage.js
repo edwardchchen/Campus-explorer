@@ -1,5 +1,15 @@
 import Typography from "@material-ui/core/Typography";
-import {Button, Container, Divider, FormControl, Grid, InputLabel, MenuItem, Select} from "@material-ui/core";
+import {
+	Button,
+	Container,
+	Divider,
+	FormControl,
+	Grid,
+	InputLabel,
+	MenuItem,
+	Select,
+	TextField
+} from "@material-ui/core";
 import {makeStyles} from '@material-ui/core/styles';
 import React from "react";
 const useStyles = makeStyles((theme) => ({
@@ -11,6 +21,9 @@ const useStyles = makeStyles((theme) => ({
 	},
 	button:{
 		marginTop: 15,
+	},
+	textField:{
+		marginTop: 30,
 	},
 
 }));
@@ -28,24 +41,39 @@ export default function EditPage(props){
 			</Typography>
 			<Divider/>
 			<Grid container spacing={1}>
-				<Grid item xs={6}>
+				<Grid item xs={3}>
+
+				<TextField  id="outlined-basic" label="DataSet ID" variant="outlined" margin="normal" />
+				</Grid>
+				<Grid item xs={3}>
 				<FormControl fullWidth>
-				<InputLabel id="select">Select a dataset to add</InputLabel>
+				<InputLabel className={classes.textField} id="select">Kind</InputLabel>
 				<Select
+
 					labelId="demo-simple-select-label"
 					id="demo-simple-select"
 					value={datasetToAdd}
-					label="Age"
 					onChange={(event)=>setDataSetToAdd(event.target.value)}
 				>
-					<MenuItem value={""}>None</MenuItem>
 					<MenuItem value={"courses"}>Courses</MenuItem>
 					<MenuItem value={"rooms"}>Rooms</MenuItem>
 				</Select>
 			</FormControl>
 				</Grid>
-				<Grid item xs={6}>
+				<Grid item xs={3}>
 
+				<Button className={classes.button} color='primary'
+					variant="contained"
+					component="label"
+				>
+					Upload File
+					<input
+						type="file"
+						hidden
+					/>
+				</Button>
+				</Grid>
+				<Grid item xs={3}>
 					<Button className={classes.button} color='primary' size='medium' variant='contained'>
 						Submit
 					</Button>
@@ -58,23 +86,12 @@ export default function EditPage(props){
 			</Typography>
 			<Divider/>
 			<Grid container spacing={1}>
-				<Grid item xs={6}>
+				<Grid item xs={3}>
 
-				<FormControl fullWidth>
-				<InputLabel id="select">Select a dataset to remove</InputLabel>
-				<Select
-					labelId="demo-simple-select-label"
-					id="demo-simple-select"
-					value={datasetToRemove}
-					label="Age"
-					onChange={(event)=>setDataSetToRemove(event.target.value)}
-				>
-					<MenuItem value={"courses"}>Courses</MenuItem>
-					<MenuItem value={"rooms"}>Rooms</MenuItem>
-				</Select>
-			</FormControl>
+					<TextField  id="outlined-basic" label="DataSet ID" variant="outlined" margin="normal" />
 				</Grid>
-				<Grid item xs={6}>
+
+				<Grid item xs={3}>
 
 					<Button className={classes.button} color='primary' size='medium' variant='contained'>
 				Remove
