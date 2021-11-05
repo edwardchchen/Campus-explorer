@@ -2,6 +2,7 @@ import {Course} from "./Course";
 import ValidateHelper from "./ValidateHelper";
 import QueryTransformationHelper from "./QueryTransformationHelper";
 import {InsightError, ResultTooLargeError} from "./IInsightFacade";
+import {Room} from "./Room";
 
 export default class RoomQueryExecuteHelper {
 
@@ -13,6 +14,7 @@ export default class RoomQueryExecuteHelper {
 		["lat", "lon", "seats", "fullname", "shortname", "number", "name", "address", "type", "furniture", "href"];
 
 	// private filteredListofCourses: any[] = [];
+	// TODO change this from course to room
 	private filteredDataset: Course[];
 	private id: string;
 	private validateHelper!: ValidateHelper;
@@ -52,7 +54,7 @@ export default class RoomQueryExecuteHelper {
 					this.transformationHelper.transformAllQuery(this.validateHelper, this.filteredDataset, query);
 			}
 			if (this.validateHelper.requiresOrder) {
-				this.filteredDataset = this.orderSort();
+				// this.filteredDataset = this.orderSort();
 				this.filteredDataset = this.addIdIntoFields(this.filteredDataset);
 				return Promise.resolve(this.filteredDataset);
 			} else {
@@ -199,21 +201,42 @@ export default class RoomQueryExecuteHelper {
 		}
 	}
 
-	private orderSort(): Course[] { // sorts the Course[] based on if it is comparing num or string
-		// if (this.whereMathField.includes(this.validateHelper.orderBy)) {
-		// 	// sort in ascending order
-		// 	this.filteredDataset.sort((a, b) =>{
-		// 		return a[this.validateHelper.orderBy] - b[this.validateHelper.orderBy];
-		// 	});
-		// 	return this.filteredDataset;
-		// } else if (this.whereStringField.includes(this.validateHelper.orderBy)) {
-		// 	// sort by a-z
-		// 	this.filteredDataset.sort((a, b) =>{
-		// 		return a[this.validateHelper.orderBy].localeCompare(b[this.validateHelper.orderBy]);
-		// 	});
-		// 	return this.filteredDataset;
+	private orderSort(): any {
+		return null;
+		// if("" === this.validateHelper.orderDirection || this.validateHelper.orderDirection === "UP" ){
+		// 	for(const attribute  of this.validateHelper.orderBy){
+		// 		if (this.whereMathField.includes(attribute)) {
+		// 			// sort in ascending order
+		// 			this.filteredDataset.sort((a, b) =>{
+		// 				return a[attribute] - b[attribute];
+		// 			});
+		// 			return this.filteredDataset;
+		// 		} else if (this.whereStringField.includes(attribute)) {
+		// 			// sort by a-z
+		// 			this.filteredDataset.sort((a, b) =>{
+		// 				return a[attribute].localeCompare(b[attribute]);
+		// 			});
+		// 			return this.filteredDataset;
+		// 		}
+		// 	}
+		// }else if(this.validateHelper.orderDirection === "DOWN"){
+		// 	for(const attribute  of this.validateHelper.orderBy){
+		// 		if (this.whereMathField.includes(attribute)) {
+		// 			// sort in ascending order
+		// 			this.filteredDataset.sort((a, b) =>{
+		// 				return b[attribute] - a[attribute];
+		// 			});
+		// 			return this.filteredDataset;
+		// 		} else if (this.whereStringField.includes(attribute)) {
+		// 			// sort by a-z
+		// 			this.filteredDataset.sort((a, b) =>{
+		// 				return b[attribute].localeCompare(a[attribute]);
+		// 			});
+		// 			return this.filteredDataset;
+		// 		}
+		// 	}
 		// }
-		return this.filteredDataset;
+		// return this.filteredDataset;
 	}
 
 }
