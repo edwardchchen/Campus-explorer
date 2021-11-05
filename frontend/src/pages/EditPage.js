@@ -1,5 +1,5 @@
 import Typography from "@material-ui/core/Typography";
-import {Button, Container, Divider, FormControl, InputLabel, MenuItem, Select} from "@material-ui/core";
+import {Button, Container, Divider, FormControl, Grid, InputLabel, MenuItem, Select} from "@material-ui/core";
 import {makeStyles} from '@material-ui/core/styles';
 import React from "react";
 const useStyles = makeStyles((theme) => ({
@@ -9,6 +9,10 @@ const useStyles = makeStyles((theme) => ({
 	container:{
 		paddingLeft: theme.spacing(10),
 	},
+	button:{
+		marginTop: 15,
+	},
+
 }));
 
 export default function EditPage(props){
@@ -23,7 +27,9 @@ export default function EditPage(props){
 				Add dataset
 			</Typography>
 			<Divider/>
-			<FormControl fullWidth>
+			<Grid container spacing={1}>
+				<Grid item xs={6}>
+				<FormControl fullWidth>
 				<InputLabel id="select">Select a dataset to add</InputLabel>
 				<Select
 					labelId="demo-simple-select-label"
@@ -37,16 +43,24 @@ export default function EditPage(props){
 					<MenuItem value={"rooms"}>Rooms</MenuItem>
 				</Select>
 			</FormControl>
-			<Button variant="contained">
-				Add Dataset
-			</Button>
+				</Grid>
+				<Grid item xs={6}>
+
+					<Button className={classes.button} color='primary' size='medium' variant='contained'>
+						Submit
+					</Button>
+				</Grid>
+			</Grid>
 		</Container>
 		<Container>
 			<Typography align={'left'} variant="h4" className={classes.title}>
 				Remove dataset
 			</Typography>
 			<Divider/>
-			<FormControl fullWidth>
+			<Grid container spacing={1}>
+				<Grid item xs={6}>
+
+				<FormControl fullWidth>
 				<InputLabel id="select">Select a dataset to remove</InputLabel>
 				<Select
 					labelId="demo-simple-select-label"
@@ -59,9 +73,14 @@ export default function EditPage(props){
 					<MenuItem value={"rooms"}>Rooms</MenuItem>
 				</Select>
 			</FormControl>
-			<Button variant="contained">
-				Remove Dataset
+				</Grid>
+				<Grid item xs={6}>
+
+					<Button className={classes.button} color='primary' size='medium' variant='contained'>
+				Remove
 			</Button>
+				</Grid>
+			</Grid>
 		</Container>
 		</div>
 
