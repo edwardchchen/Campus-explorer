@@ -12,7 +12,7 @@ export default class CourseQueryExecuteHelper {
 	// private filteredListofCourses: any[] = [];
 	private filteredDataset: Course[];
 	private id: string;
-	private validateHelper!: ValidateHelper;
+	private validateHelper: ValidateHelper;
 	private columnRequiredToBeRemoved: string[];
 	private passedInDataset: Course[];
 	private transformationHelper!: QueryTransformationHelper;
@@ -24,6 +24,7 @@ export default class CourseQueryExecuteHelper {
 		this.passedInDataset = [];
 		this.transformationHelper = new QueryTransformationHelper();
 		this.columnRequiredToBeRemoved = [];
+		this.validateHelper = new ValidateHelper();
 	}
 
 	public columnsNotIncluded(): void { // output a list of columns that should be removed in Course due to OPTIONS not specifying them
@@ -48,13 +49,23 @@ export default class CourseQueryExecuteHelper {
 			if (this.validateHelper.requireTransformation) {
 				this.filteredDataset =
 					this.transformationHelper.transformAllQuery(this.validateHelper, this.filteredDataset, query);
+				this.validateHelper.transformationColumn = [];
+				this.validateHelper.allColumnField = [];
+				this.validateHelper.dataSetField = [];
+				return Promise.resolve(this.filteredDataset);
 			}
 			if (this.validateHelper.requiresOrder) {
 				this.filteredDataset = this.orderSort();
 				this.filteredDataset = this.addIdIntoFields(this.filteredDataset);
+				this.validateHelper.dataSetField = [];
+				this.validateHelper.transformationColumn = [];
+				this.validateHelper.allColumnField = [];
 				return Promise.resolve(this.filteredDataset);
 			} else {
 				this.filteredDataset = this.addIdIntoFields(this.filteredDataset);
+				this.validateHelper.dataSetField = [];
+				this.validateHelper.transformationColumn = [];
+				this.validateHelper.allColumnField = [];
 				return Promise.resolve(this.filteredDataset);
 			}
 

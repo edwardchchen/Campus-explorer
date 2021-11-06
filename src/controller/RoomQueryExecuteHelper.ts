@@ -36,7 +36,7 @@ export default class RoomQueryExecuteHelper {
 		this.columnRequiredToBeRemoved = this.allFields.filter((x) => !dataSetFieldPlusApplyField.includes(x));
 	}
 
-
+    // TODO make sorting work for rooms, some of these are for Course, should change
 	public executeAndOrder(id: string, dataSet: Course[], validateHelper: ValidateHelper, query: any): Promise<any> { // return a filtered list of courses
 		// first filter list and then if it is more than 5000 in length reject, otherwise
 		// second if there is order then order by specified column
@@ -56,9 +56,15 @@ export default class RoomQueryExecuteHelper {
 			if (this.validateHelper.requiresOrder) {
 				// this.filteredDataset = this.orderSort();
 				this.filteredDataset = this.addIdIntoFields(this.filteredDataset);
+				this.validateHelper.transformationColumn = [];
+				this.validateHelper.allColumnField = [];
+				this.validateHelper.dataSetField = [];
 				return Promise.resolve(this.filteredDataset);
 			} else {
 				this.filteredDataset = this.addIdIntoFields(this.filteredDataset);
+				this.validateHelper.transformationColumn = [];
+				this.validateHelper.allColumnField = [];
+				this.validateHelper.dataSetField = [];
 				return Promise.resolve(this.filteredDataset);
 			}
 
