@@ -137,7 +137,15 @@ export default class ValidateOPTIONSHelper {
 
 	public validateOrderDir (dir: any): boolean {
 		if (typeof dir === "string") {
-			return dir === "UP" || dir === "DOWN";
+			if (dir === "UP") {
+				this.validateHelperTemp.orderDirection = "UP";
+				return true;
+			} else if (dir === "DOWN") {
+				this.validateHelperTemp.orderDirection = "DOWN";
+				return true;
+			} else {
+				return false;
+			}
 		} else {
 			return false;
 		}

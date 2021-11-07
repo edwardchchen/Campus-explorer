@@ -19,6 +19,7 @@ export default class ValidateHelper {
 	public requireTransformation: boolean;
 	public validateTransformation!: ValidateTransformation;
 	public validateHelperHelper!: ValidateOPTIONSHelper;
+	public orderDirection: string = "";
 	constructor() {
 		this.result = true;
 		this.queryID = "";
