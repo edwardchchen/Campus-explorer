@@ -45,7 +45,7 @@ export default class DataStore{
 				fail: course.Fail,
 				audit: course.Audit,
 				uuid: String(course.id),
-				year: course.Year,
+				year: parseInt(course.Year, 10),
 			};
 			return c;
 		}
