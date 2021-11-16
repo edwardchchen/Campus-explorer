@@ -3,6 +3,7 @@ import * as http from "http";
 import cors from "cors";
 import InsightFacade from "../controller/InsightFacade";
 import {InsightDatasetKind, InsightError, NotFoundError} from "../controller/IInsightFacade";
+import {expect} from "chai";
 
 export default class Server {
 	private readonly port: number;
@@ -99,56 +100,51 @@ export default class Server {
 	}
 
 	private static putDS(req: Request, res: Response){
-		try{
-			let reqJson = req.params;
-			let reqKind = reqJson.kind;
-			let id  = reqJson.id;
-			let content;
-			let kind;
-			if(reqKind === "rooms"){
-				kind = InsightDatasetKind.Rooms;
-			}else if(reqKind === "courses"){
-				kind = InsightDatasetKind.Courses;
-			}else{
-				res.status(400).json({error: new Error("wrong dataset kind")});
-				return;
-			}
-			content = new Buffer(reqJson.body).toString("base64");
-			Server.insightFacade.addDataset(id,content,kind).then((data) => {
-				console.log(data);
-				res.status(200).json({result: data});
-			});
-		}catch (err) {
-			res.status(400).json({error: err});
+		let reqJson = req.params;
+		let reqKind = reqJson.kind;
+		let id  = reqJson.id;
+		let content;
+		let kind;
+		if(reqKind === "rooms"){
+			kind = InsightDatasetKind.Rooms;
+		}else if(reqKind === "courses"){
+			kind = InsightDatasetKind.Courses;
+		}else{
+			res.status(400).json({error: new Error("wrong dataset kind")});
+			return;
 		}
+		content = new Buffer(reqJson.body).toString("base64");
+		Server.insightFacade.addDataset(id,content,kind).then((data) => {
+			console.log(data);
+			res.status(200).json({result: data});
+		}).catch((err)=>{
+			res.status(404).json({error: err});
+		});
 	}
 
 	private static deleteDS(req: Request, res: Response){
-		try{
-			let reqJson = req.params;
-			let id  = reqJson.id;
-			Server.insightFacade.removeDataset(id).then((data) => {
-				res.status(200).json({result: data});
-			});
-		}catch (err) {
+		let reqJson = req.params;
+		let id  = reqJson.id;
+		Server.insightFacade.removeDataset(id).then((data) => {
+			res.status(200).json({result: data});
+		}).catch((err)=>{
 			if(err instanceof NotFoundError){
 				res.status(404).json({error: err});
 
 			}else{
 				res.status(400).json({error: err});
 			}
-		}
+		});
 	}
 
 	private static queryDS(req: Request, res: Response){
-		try{
-			let query  = req.body;
-			Server.insightFacade.performQuery(query).then((data) => {
-				res.status(200).json({result: data});
-			});
-		}catch (err) {
-			res.status(400).json({error: err});
-		}
+		let query  = req.body;
+		Server.insightFacade.performQuery(query).then((data) => {
+			res.status(200).json({result: data});
+		}).catch((err)=>{
+			res.status(404).json({error: err});
+		});
+
 	}
 
 

@@ -1,6 +1,8 @@
 import Typography from "@material-ui/core/Typography";
 import {Button, Container, Divider, FormControl, InputLabel, MenuItem, Select} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
+import {useEffect} from "react";
+const axios = require('axios');
 
 const useStyles = makeStyles((theme) => ({
 	title:{
@@ -13,6 +15,12 @@ const useStyles = makeStyles((theme) => ({
 
 export default function ListPage(props){
 	const classes = useStyles()
+
+	useEffect(() => {
+		axios.get('http://localhost:4321/datasets').then(res => {
+			console.log(res);
+		});
+	});
 
 	return(
 		<Container>
