@@ -9,7 +9,6 @@
 		"node": ">= 14 < 15"
 	},
 	"dependencies": {
-		"@mui/icons-material": "^5.0.5",
 		"cors": "2.8.5",
 		"decimal.js": "10.3.1",
 		"express": "4.17.1",
