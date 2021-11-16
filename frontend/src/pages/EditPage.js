@@ -12,7 +12,8 @@ import {
 } from "@material-ui/core";
 import {makeStyles} from '@material-ui/core/styles';
 import React from "react";
-
+import courses from "../datasets/courses";
+import rooms from "../datasets/rooms";
 const fs = require('fs');
 const useStyles = makeStyles((theme) => ({
 	title:{
@@ -59,29 +60,25 @@ export default function EditPage(props){
 		return fs.readFileSync(dir).toString("base64")
 	}
 	const handleAdd = () => {
-		let courseDir = "./frontend/src/datasets/courses.txt"
-		let	roomDir = "./frontend/src/datasets/rooms.txt"
-		let dir = ""
 		let url = "http://localhost:4321/dataset/:"+datasetToAdd+"/:"+datasetKind
-		dir = datasetKind === "rooms" ? roomDir : courseDir;
-		fetch("./frontend/src/datasets/rooms.txt")
-			.then(response => response.text())
-			.then(text => alert(text))
+		let content = datasetKind === "rooms" ? rooms : courses;
+		url = "http://localhost:4321/dataset/id/courses"
 
-
-
-		// axios.put(url)
-		// 	.then(res => {
-		// 		console.log(res);
-		// 		alert("Dataset removed")
-		// 	}).catch((err)=>{
-		// 	setOpen(true)
-		// 	if(err.response.status===404){
-		// 		alert("Dataset not found")
-		// 	}else{
-		// 		alert("Invalid dataset id")
-		// 	}
-		// });
+		axios.put(
+			url,
+			content,
+		{headers: {"Content-Type": "application/x-zip-compressed"}})
+			.then(res => {
+				console.log(res);
+				alert("Dataset Added")
+			}).catch((err)=>{
+			setOpen(true)
+			if(err.response.status===404){
+				alert("Dataset not found")
+			}else{
+				alert("Invalid dataset id")
+			}
+		});
 	}
 
 

@@ -113,12 +113,13 @@ export default class Server {
 			res.status(400).json({error: new Error("wrong dataset kind")});
 			return;
 		}
-		content = new Buffer(reqJson.body).toString("base64");
+		console.log(req);
+		content = new (Buffer.alloc as any)(req.body.length,req.body,"base64").toString();
 		Server.insightFacade.addDataset(id,content,kind).then((data) => {
-			console.log(data);
+			console.log(reqJson.body);
 			res.status(200).json({result: data});
 		}).catch((err)=>{
-			res.status(404).json({error: err});
+			res.status(400).json({error: err});
 		});
 	}
 
