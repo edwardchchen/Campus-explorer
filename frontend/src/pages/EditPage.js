@@ -39,7 +39,7 @@ export default function EditPage(props){
 
 	const handleRemove = () => {
 		console.log(datasetToRemove)
-		let url = "http://localhost:4321/dataset/:'+datasetToRemove"
+		let url = "http://localhost:4321/dataset/:"+datasetToRemove
 		axios.delete(url)
 			.then(res => {
 			console.log(res);
@@ -47,9 +47,9 @@ export default function EditPage(props){
 		}).catch((err)=>{
 			setOpen(true)
 			if(err.response.status===404){
-				alert("Dataset Not Found")
+				alert("Dataset not found")
 			}else{
-				alert("Invalid Dataset Id")
+				alert("Invalid dataset id")
 			}
 		});
 	}
@@ -114,7 +114,7 @@ export default function EditPage(props){
 
 				<Grid item xs={3}>
 					<Button className={classes.button} color='primary' size='medium' variant='contained'
-					onClick={handleRemove}>
+					onClick={handleRemove} disabled={datasetToRemove===""}>
 				Remove
 			</Button>
 				</Grid>
