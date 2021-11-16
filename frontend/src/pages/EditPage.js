@@ -12,6 +12,7 @@ import {
 } from "@material-ui/core";
 import {makeStyles} from '@material-ui/core/styles';
 import React from "react";
+import Warning from "../components/Snackbar";
 const useStyles = makeStyles((theme) => ({
 	title:{
 		fontWeight: 500,
@@ -27,12 +28,32 @@ const useStyles = makeStyles((theme) => ({
 	},
 
 }));
+const axios = require('axios');
 
 export default function EditPage(props){
 	const [datasetToAdd, setDataSetToAdd] = React.useState('');
 	const [datasetToRemove, setDataSetToRemove] = React.useState('');
-
+	const [open, setOpen] = React.useState(false);
+	const [message, setMessage] = React.useState(false);
 	const classes = useStyles()
+
+	const handleRemove = () => {
+		console.log(datasetToRemove)
+		let url = "http://localhost:4321/dataset/:"+datasetToRemove
+		axios.delete(url)
+			.then(res => {
+			console.log(res);
+			alert("Dataset removed")
+		}).catch((err)=>{
+			setOpen(true)
+			if(err.response.status===404){
+				alert("Dataset not found")
+			}else{
+				alert("Invalid dataset id")
+			}
+		});
+	}
+
 	return(
 		<div>
 		<Container>
@@ -60,19 +81,19 @@ export default function EditPage(props){
 				</Select>
 			</FormControl>
 				</Grid>
-				<Grid item xs={3}>
+				{/*<Grid item xs={3}>*/}
 
-				<Button className={classes.button} color='primary'
-					variant="contained"
-					component="label"
-				>
-					Upload File
-					<input
-						type="file"
-						hidden
-					/>
-				</Button>
-				</Grid>
+				{/*<Button className={classes.button} color='primary'*/}
+				{/*	variant="contained"*/}
+				{/*	component="label"*/}
+				{/*>*/}
+				{/*	Upload File*/}
+				{/*	<input*/}
+				{/*		type="file"*/}
+				{/*		hidden*/}
+				{/*	/>*/}
+				{/*</Button>*/}
+				{/*</Grid>*/}
 				<Grid item xs={3}>
 					<Button className={classes.button} color='primary' size='medium' variant='contained'>
 						Submit
@@ -87,13 +108,13 @@ export default function EditPage(props){
 			<Divider/>
 			<Grid container spacing={1}>
 				<Grid item xs={3}>
-
-					<TextField  id="outlined-basic" label="DataSet ID" variant="outlined" margin="normal" />
+					<TextField  id="outlined-basic" label="DataSet ID" variant="outlined" margin="normal"
+					onChange={(event)=>setDataSetToRemove(event.target.value)}/>
 				</Grid>
 
 				<Grid item xs={3}>
-
-					<Button className={classes.button} color='primary' size='medium' variant='contained'>
+					<Button className={classes.button} color='primary' size='medium' variant='contained'
+					onClick={handleRemove} disabled={datasetToRemove===""}>
 				Remove
 			</Button>
 				</Grid>

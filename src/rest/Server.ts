@@ -1,16 +1,22 @@
 import express, {Application, Request, Response} from "express";
 import * as http from "http";
 import cors from "cors";
+import InsightFacade from "../controller/InsightFacade";
+import {InsightDatasetKind, InsightError, NotFoundError} from "../controller/IInsightFacade";
+import {expect} from "chai";
 
 export default class Server {
 	private readonly port: number;
 	private express: Application;
 	private server: http.Server | undefined;
+	private static insightFacade: InsightFacade;
+
 
 	constructor(port: number) {
 		console.info(`Server::<init>( ${port} )`);
 		this.port = port;
 		this.express = express();
+		Server.insightFacade = new InsightFacade();
 
 		this.registerMiddleware();
 		this.registerRoutes();
@@ -78,6 +84,7 @@ export default class Server {
 		this.express.use(cors());
 	}
 
+
 	// Registers all request handlers to routes
 	private registerRoutes() {
 		// This is an example endpoint this you can invoke by accessing this URL in your browser:
@@ -85,7 +92,67 @@ export default class Server {
 		this.express.get("/echo/:msg", Server.echo);
 
 		// TODO: your other endpoints should go here
+		this.express.put("/dataset/:id/:kind", Server.putDS);
+		this.express.get("/datasets", Server.listDS);
+		this.express.delete("/dataset/:id", Server.deleteDS);
+		this.express.post("/query", Server.queryDS);
 
+	}
+
+	private static putDS(req: Request, res: Response){
+		let reqJson = req.params;
+		let reqKind = reqJson.kind;
+		let id  = reqJson.id;
+		let content;
+		let kind;
+		if(reqKind === "rooms"){
+			kind = InsightDatasetKind.Rooms;
+		}else if(reqKind === "courses"){
+			kind = InsightDatasetKind.Courses;
+		}else{
+			res.status(400).json({error: new Error("wrong dataset kind")});
+			return;
+		}
+		content = new Buffer(reqJson.body).toString("base64");
+		Server.insightFacade.addDataset(id,content,kind).then((data) => {
+			console.log(data);
+			res.status(200).json({result: data});
+		}).catch((err)=>{
+			res.status(404).json({error: err});
+		});
+	}
+
+	private static deleteDS(req: Request, res: Response){
+		let reqJson = req.params;
+		let id  = reqJson.id;
+		Server.insightFacade.removeDataset(id).then((data) => {
+			res.status(200).json({result: data});
+		}).catch((err)=>{
+			if(err instanceof NotFoundError){
+				res.status(404).json({error: err});
+
+			}else{
+				res.status(400).json({error: err});
+			}
+		});
+	}
+
+	private static queryDS(req: Request, res: Response){
+		let query  = req.body;
+		Server.insightFacade.performQuery(query).then((data) => {
+			res.status(200).json({result: data});
+		}).catch((err)=>{
+			res.status(404).json({error: err});
+		});
+
+	}
+
+
+	private static listDS(req: Request, res: Response){
+		Server.insightFacade.listDatasets().then((data) => {
+			console.log(data);
+			res.status(200).json({result: data});
+		});
 	}
 
 	// The next two methods handle the echo service.
