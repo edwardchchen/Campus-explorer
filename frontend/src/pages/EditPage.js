@@ -12,10 +12,8 @@ import {
 } from "@material-ui/core";
 import {makeStyles} from '@material-ui/core/styles';
 import React from "react";
-import Warning from "../components/Snackbar";
 
-import { readSync } from 'fs';
-const fs = require('fs')
+const fs = require('fs');
 const useStyles = makeStyles((theme) => ({
 	title:{
 		fontWeight: 500,
@@ -61,26 +59,29 @@ export default function EditPage(props){
 		return fs.readFileSync(dir).toString("base64")
 	}
 	const handleAdd = () => {
-		let courseDir = "./frontend/src/datasets/courses.zip"
-		let	roomDir = "./frontend/src/datasets/rooms.zip"
+		let courseDir = "./frontend/src/datasets/courses.txt"
+		let	roomDir = "./frontend/src/datasets/rooms.txt"
 		let dir = ""
 		let url = "http://localhost:4321/dataset/:"+datasetToAdd+"/:"+datasetKind
 		dir = datasetKind === "rooms" ? roomDir : courseDir;
-		let content = readDS(dir)
+		fetch("./frontend/src/datasets/rooms.txt")
+			.then(response => response.text())
+			.then(text => alert(text))
 
 
-		axios.put(url)
-			.then(res => {
-				console.log(res);
-				alert("Dataset removed")
-			}).catch((err)=>{
-			setOpen(true)
-			if(err.response.status===404){
-				alert("Dataset not found")
-			}else{
-				alert("Invalid dataset id")
-			}
-		});
+
+		// axios.put(url)
+		// 	.then(res => {
+		// 		console.log(res);
+		// 		alert("Dataset removed")
+		// 	}).catch((err)=>{
+		// 	setOpen(true)
+		// 	if(err.response.status===404){
+		// 		alert("Dataset not found")
+		// 	}else{
+		// 		alert("Invalid dataset id")
+		// 	}
+		// });
 	}
 
 
@@ -125,7 +126,9 @@ export default function EditPage(props){
 				{/*</Button>*/}
 				{/*</Grid>*/}
 				<Grid item xs={3}>
-					<Button className={classes.button} color='primary' size='medium' variant='contained'>
+					<Button className={classes.button}
+							color='primary' size='medium' variant='contained'
+							onClick={handleAdd}>
 						Submit
 					</Button>
 				</Grid>
