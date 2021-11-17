@@ -138,11 +138,12 @@ export default class Server {
 
 	private static queryDS(req: Request, res: Response){
 		let query  = req.body;
+		console.log(req);
 		Server.insightFacade.performQuery(query).then((data) => {
 			console.log(data);
 			res.status(200).json({result: data});
 		}).catch((err)=>{
-			res.status(404).json({error: err});
+			res.status(400).json({error: err});
 		});
 
 	}

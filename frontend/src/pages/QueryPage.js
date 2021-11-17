@@ -21,12 +21,17 @@ export default function QueryPage(props){
 	const [courseId,setCourseId] = React.useState("");
 
 	const [roomResult,setRoomResult]= React.useState([]);
+	const [courseResult,setCourseResult]= React.useState([]);
+
 	const handleCourseSearch =()=>{
 		let queryInJson = JSON.parse(coursesQuery);
 		queryInJson.WHERE.AND[0].IS.courses_id = courseId
 		queryInJson.WHERE.AND[1].IS.courses_dept = courseDep
 		queryInJson.WHERE.AND[2].EQ.courses_year = parseInt(courseYear)
-		console.log(queryInJson)
+		axios.post('http://localhost:4321/query', queryInJson).then(res => {
+			setCourseResult(res.data.result)
+			console.log(res.data.result);
+		});
 
 
 	}
@@ -77,6 +82,9 @@ export default function QueryPage(props){
 							variant='contained' onClick={handleCourseSearch}>
 						Submit
 					</Button>
+				</Grid>
+				<Grid item xs={12}>
+					{JSON.stringify(courseResult)}
 				</Grid>
 			</Grid>
 			<Typography align={'left'} variant="h4">
