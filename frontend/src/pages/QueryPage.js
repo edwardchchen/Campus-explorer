@@ -1,7 +1,11 @@
 import Typography from "@material-ui/core/Typography";
 import {Box, Button, Container, Divider, Grid, TextField} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
-import React from "react";
+import React from "react"
+import {coursesQuery,roomsQuery} from "../queries";
+import {Label} from "@material-ui/icons";
+const axios = require('axios');
+
 const useStyles = makeStyles((theme) => ({
 	button:{
 		marginTop: 30,
@@ -15,11 +19,26 @@ export default function QueryPage(props){
 	const [courseDep,setCourseDep] = React.useState("");
 	const [courseYear,setCourseYear] = React.useState("");
 	const [courseId,setCourseId] = React.useState("");
+
+	const [roomResult,setRoomResult]= React.useState([]);
 	const handleCourseSearch =()=>{
-		console.log("hi")
+		let queryInJson = JSON.parse(coursesQuery);
+		queryInJson.WHERE.AND[0].IS.courses_id = courseId
+		queryInJson.WHERE.AND[1].IS.courses_dept = courseDep
+		queryInJson.WHERE.AND[2].EQ.courses_year = parseInt(courseYear)
+		console.log(queryInJson)
+
+
 	}
 	const handleRoomSearch =()=>{
-		console.log("hi")
+		let queryInJson = JSON.parse(roomsQuery);
+		queryInJson.WHERE.AND[0].IS.rooms_shortname = buildingName
+		queryInJson.WHERE.AND[1].IS.rooms_number = roomNum
+		console.log(queryInJson)
+		axios.post('http://localhost:4321/query', queryInJson).then(res => {
+			setRoomResult(res.data.result[0])
+			console.log(res.data.result);
+		});
 
 	}
 
@@ -84,6 +103,9 @@ export default function QueryPage(props){
 					disabled={roomNum.length===0||buildingName.length===0} onClick={handleRoomSearch}>
 						Submit
 					</Button>
+				</Grid>
+				<Grid item xs={12}>
+					{JSON.stringify(roomResult)}
 				</Grid>
 			</Grid>
 
