@@ -1,7 +1,8 @@
 import Typography from "@material-ui/core/Typography";
 import {Button, Container, Divider, FormControl, InputLabel, MenuItem, Select} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
-import {useEffect} from "react";
+import React, {useEffect} from "react";
+import DSTable from "../components/Table";
 const axios = require('axios');
 
 const useStyles = makeStyles((theme) => ({
@@ -15,12 +16,14 @@ const useStyles = makeStyles((theme) => ({
 
 export default function ListPage(props){
 	const classes = useStyles()
+	const [datasets,setDatasets] = React.useState([])
 
 	useEffect(() => {
 		axios.get('http://localhost:4321/datasets').then(res => {
-			console.log(res);
+			setDatasets(res.data.result)
+			console.log(res.data.result);
 		});
-	});
+	}, []);
 
 	return(
 		<Container>
@@ -28,6 +31,7 @@ export default function ListPage(props){
 				List Datasets
 			</Typography>
 			<Divider/>
+			<DSTable datasets={datasets}/>
 
 		</Container>
 	)
