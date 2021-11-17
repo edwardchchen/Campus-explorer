@@ -68,7 +68,7 @@ export default class QueryTransformationHelper {
 		return groupByData.map((singleArray) => { // for each array in the filtered list
 			let finalList: { [key: string]: any } = {};
 			for (let key of columnDataSetKeys) { // for example if key is dept, then it should be in the single array
-				finalList[key] = singleArray[0][key];
+				finalList[this.vh.findID() + "_" + key] = singleArray[0][key];
 			}
 			for (let singleApplyKey of applyKeys) {
 				let applyKeyName = Object.keys(singleApplyKey)[0];
