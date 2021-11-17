@@ -11,9 +11,9 @@ export default class ValidateHelper {
 	public isCourseQuery: boolean = false;
 	private queryID: string;
 	private result: boolean; // result for the validateAllQuery
-	public allColumnField: string[] = []; // all columns include both Transformation and DataSet Columns
-	public dataSetField: string[] = [];
-	public transformationColumn: string[] = []; // there can be more than one transformation attributes but they all have to appear in Transformation
+	public allColumnField: string[]; // all columns include both Transformation and DataSet Columns
+	public dataSetField: string[];
+	public transformationColumn: string[]; // there can be more than one transformation attributes but they all have to appear in Transformation
 	public requiresOrder: boolean;
 	public orderBy: string[] = []; // Order by records which column will be sorted after determined valid
 	public requireTransformation: boolean;
@@ -21,6 +21,9 @@ export default class ValidateHelper {
 	public validateHelperHelper!: ValidateOPTIONSHelper;
 	public orderDirection: string = "";
 	constructor() {
+		this.dataSetField = [];
+		this.allColumnField = [];
+		this.transformationColumn = [];
 		this.result = true;
 		this.queryID = "";
 		this.requiresOrder = false;

@@ -12,17 +12,18 @@ export default class CourseQueryExecuteHelper {
 	// private filteredListofCourses: any[] = [];
 	private filteredDataset: Course[];
 	private id: string;
-	private validateHelper!: ValidateHelper;
-	private columnRequiredToBeRemoved!: string[];
+	private validateHelper: ValidateHelper;
+	private columnRequiredToBeRemoved: string[];
 	private passedInDataset: Course[];
 	private transformationHelper!: QueryTransformationHelper;
-
 
 	constructor() {
 		this.filteredDataset = [];
 		this.id = "";
 		this.passedInDataset = [];
 		this.transformationHelper = new QueryTransformationHelper();
+		this.columnRequiredToBeRemoved = [];
+		this.validateHelper = new ValidateHelper();
 	}
 
 	public columnsNotIncluded(): void { // output a list of columns that should be removed in Course due to OPTIONS not specifying them
@@ -39,27 +40,48 @@ export default class CourseQueryExecuteHelper {
 		this.validateHelper = validateHelper;
 		this.columnsNotIncluded();
 		this.passedInDataset = dataSet;
+		let tempDataset: Course[] = [];
 		try{
 			this.filteredDataset = this.filterEachCourse(Object.values(query)[0], dataSet);
 			if (this.filteredDataset.length > 5000) {
+				this.reset();
 				return Promise.reject(new ResultTooLargeError(this.filteredDataset.length));
 			}
+			for (let singleCourse of this.filteredDataset) {
+				let copiedSingleCourse: Course = JSON.parse(JSON.stringify(singleCourse));
+				this.deleteField(copiedSingleCourse); // make sure it is the copied course
+				tempDataset.push (copiedSingleCourse);
+			}
+			this.filteredDataset = tempDataset;
 			if (this.validateHelper.requireTransformation) {
 				this.filteredDataset =
 					this.transformationHelper.transformAllQuery(this.validateHelper, this.filteredDataset, query);
+				this.reset();
+				return Promise.resolve(this.filteredDataset);
 			}
 			if (this.validateHelper.requiresOrder) {
 				this.filteredDataset = this.orderSort();
 				this.filteredDataset = this.addIdIntoFields(this.filteredDataset);
+				this.reset();
 				return Promise.resolve(this.filteredDataset);
 			} else {
 				this.filteredDataset = this.addIdIntoFields(this.filteredDataset);
+				this.reset();
 				return Promise.resolve(this.filteredDataset);
 			}
 
 		}catch (e){
+			this.reset();
 			return Promise.reject(new InsightError());
 		}
+	}
+
+	private reset() {
+		this.validateHelper.transformationColumn = [];
+		this.validateHelper.allColumnField = [];
+		this.validateHelper.dataSetField = [];
+		this.validateHelper.orderBy = [];
+		this.validateHelper.requiresOrder = false;
 	}
 
 	private addIdIntoFields(courses: Course[]): Course[]{
@@ -104,6 +126,8 @@ export default class CourseQueryExecuteHelper {
 		let listRequiredToNotBeIncluded = this.filterEachCourse(Object.values(queryField)[0], curDataSet);
 		let filteredArray: Course[];
 		filteredArray = this.passedInDataset.filter((x) => !listRequiredToNotBeIncluded.includes(x));
+		// filteredArray = listRequiredToNotBeIncluded.filter(({ value: id1 }) =>
+		// 	!this.filteredDataset.some(({ value: id2 }) => id2 === id1));
 		return filteredArray;
 	}
 
@@ -138,11 +162,13 @@ export default class CourseQueryExecuteHelper {
 		} else if (key === "IS") {
 			let str: string = Object.values(InnerLTStatement)[0] as string;
 			let Strattribute: string = array[1]; // avg
+			const wildCard = new RegExp(`^${str.replace(/\*/g, "(.)*")}$`);
 			for (let singleCourse of curDataSet) {
-				if (singleCourse[Strattribute] === str) {
-					let copiedSingleCourse: Course = singleCourse;
-					this.deleteField(copiedSingleCourse); // make sure it is the copied course
-					filteredListCourses.push(copiedSingleCourse);
+				// if (singleCourse[Strattribute] === wildCard) {
+				if (wildCard.test(singleCourse[Strattribute])) {
+					// let copiedSingleCourse: Course = JSON.parse(JSON.stringify(singleCourse));
+					// this.deleteField(copiedSingleCourse); // make sure it is the copied course
+					filteredListCourses.push(singleCourse);
 				}
 			}
 			return filteredListCourses;
@@ -150,9 +176,9 @@ export default class CourseQueryExecuteHelper {
 			for (let singleCourse of curDataSet) {
 				if (singleCourse[attribute] === num) {
 					// let copiedSingleCourse: Course = singleCourse;
-					let copiedSingleCourse: Course = Object.assign({}, singleCourse);
-					this.deleteField(copiedSingleCourse); // make sure it is the copied course
-					filteredListCourses.push(copiedSingleCourse);
+					// let copiedSingleCourse: Course = JSON.parse(JSON.stringify(singleCourse));
+					// this.deleteField(copiedSingleCourse); // make sure it is the copied course
+					filteredListCourses.push(singleCourse);
 				}
 			}
 			return filteredListCourses;
@@ -169,9 +195,9 @@ export default class CourseQueryExecuteHelper {
 		} else { // (key === "LT")
 			for (let singleCourse of curDataSet) {
 				if (singleCourse[attribute] < num) {
-					let copiedSingleCourse: Course = Object.assign({}, singleCourse);
-					this.deleteField(copiedSingleCourse); // make sure it is the copied course
-					filteredListCourses.push(copiedSingleCourse);
+					// let copiedSingleCourse: Course = JSON.parse(JSON.stringify(singleCourse));
+					// this.deleteField(copiedSingleCourse); // make sure it is the copied course
+					filteredListCourses.push(singleCourse);
 				}
 			}
 			return filteredListCourses;
@@ -181,9 +207,9 @@ export default class CourseQueryExecuteHelper {
 	private GTHelper(curDataSet: any,attribute: any,num: any,filteredListCourses: any): any{
 		for (let singleCourse of curDataSet) {
 			if (singleCourse[attribute] > num) {
-				let copiedSingleCourse: Course = singleCourse;
-				this.deleteField(copiedSingleCourse);
-				filteredListCourses.push(copiedSingleCourse);
+				// let copiedSingleCourse: Course = JSON.parse(JSON.stringify(singleCourse));
+				// this.deleteField(copiedSingleCourse);
+				filteredListCourses.push(singleCourse);
 			}
 		}
 		return filteredListCourses;
