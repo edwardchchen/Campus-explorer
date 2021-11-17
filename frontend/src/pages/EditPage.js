@@ -36,8 +36,6 @@ export default function EditPage(props){
 	const [datasetToAdd, setDataSetToAdd] = React.useState('');
 	const [datasetKind,setDatasetKind] = React.useState('');
 	const [datasetToRemove, setDataSetToRemove] = React.useState('');
-	const [open, setOpen] = React.useState(false);
-	const [message, setMessage] = React.useState(false);
 	const classes = useStyles()
 
 	const handleRemove = () => {
@@ -45,38 +43,49 @@ export default function EditPage(props){
 		let url = "http://localhost:4321/dataset/:"+datasetToRemove
 		axios.delete(url)
 			.then(res => {
-			console.log(res);
-			alert("Dataset removed")
+				console.log(res);
+				clearRemove()
+				alert("Dataset removed")
 		}).catch((err)=>{
-			setOpen(true)
-			if(err.response.status===404){
-				alert("Dataset not found")
+			if(err.response){
+				if(err.response.status===404){
+					alert("Dataset not found")
+				}else{
+					alert("Invalid dataset id")
+				}
 			}else{
-				alert("Invalid dataset id")
+				alert(err)
 			}
 		});
 	}
-	const readDS =(dir)=>{
-		return fs.readFileSync(dir).toString("base64")
+
+	const clearAdd =()=>{
+		setDatasetKind("")
+		setDataSetToAdd("")
 	}
+	const clearRemove =()=>{
+		setDataSetToRemove("")
+	}
+
 	const handleAdd = () => {
 		let url = "http://localhost:4321/dataset/:"+datasetToAdd+"/:"+datasetKind
+		console.log(url)
 		let content = datasetKind === "rooms" ? rooms : courses;
-		url = "http://localhost:4321/dataset/id/courses"
-
 		axios.put(
 			url,
 			content,
 		{headers: {"Content-Type": "application/x-zip-compressed"}})
 			.then(res => {
 				console.log(res);
-				alert("Dataset Added")
+				alert("Dataset "+ datasetToAdd +" added")
+				clearAdd()
 			}).catch((err)=>{
-			setOpen(true)
-			if(err.response.status===404){
-				alert("Dataset not found")
-			}else{
+			if(err.response){
+				console.log(err)
 				alert("Invalid dataset id")
+			}else{
+				alert(err)
+
 			}
 		});
 	}
@@ -92,7 +101,11 @@ export default function EditPage(props){
 			<Grid container spacing={1}>
 				<Grid item xs={3}>
 
-				<TextField  id="outlined-basic" label="DataSet ID" variant="outlined" margin="normal" />
+				<TextField  id="outlined-basic"
+							label="DataSet ID" variant="outlined" margin="normal"
+							value={datasetToAdd}
+							onChange={(event)=>setDataSetToAdd(event.target.value)}
+				/>
 				</Grid>
 				<Grid item xs={3}>
 				<FormControl fullWidth>
@@ -101,8 +114,9 @@ export default function EditPage(props){
 
 					labelId="demo-simple-select-label"
 					id="demo-simple-select"
-					value={datasetToAdd}
-					onChange={(event)=>setDataSetToAdd(event.target.value)}
+					value={datasetKind}
+					onChange={(event)=>setDatasetKind(event.target.value)}
+
 				>
 					<MenuItem value={"courses"}>Courses</MenuItem>
 					<MenuItem value={"rooms"}>Rooms</MenuItem>
@@ -125,7 +139,7 @@ export default function EditPage(props){
 				<Grid item xs={3}>
 					<Button className={classes.button}
 							color='primary' size='medium' variant='contained'
-							onClick={handleAdd}>
+							onClick={handleAdd} disabled={(datasetKind.length===0 || datasetToAdd.length===0)}>
 						Submit
 					</Button>
 				</Grid>
