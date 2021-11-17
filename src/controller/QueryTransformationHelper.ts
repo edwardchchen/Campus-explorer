@@ -21,9 +21,10 @@ export default class QueryTransformationHelper {
 		this.vh = validateHelper;
 		this.passedInDataset = filteredDataset;
 		this.localQuery = query;
+		let transformations: any = query["TRANSFORMATIONS"];
 		let dataSetTransform =
 			this.multipleGroupByArray(filteredDataset,validateHelper.validateTransformation.groupByColumns);
-		dataSetTransform = this.transformApply(dataSetTransform, validateHelper.dataSetField, query["APPLY"]);
+		dataSetTransform = this.transformApply(dataSetTransform, validateHelper.dataSetField, transformations["APPLY"]);
 		return dataSetTransform;
 	}
 
@@ -64,7 +65,7 @@ export default class QueryTransformationHelper {
 	}
 
 	private transformApply (groupByData: any[][], columnDataSetKeys: string[], applyKeys: any[]): any[] {
-		groupByData.map((singleArray) => { // for each array in the filtered list
+		return groupByData.map((singleArray) => { // for each array in the filtered list
 			let finalList: { [key: string]: any } = {};
 			for (let key of columnDataSetKeys) { // for example if key is dept, then it should be in the single array
 				finalList[key] = singleArray[0][key];
@@ -73,13 +74,14 @@ export default class QueryTransformationHelper {
 				let applyKeyName = Object.keys(singleApplyKey)[0];
 				let innerApplykeyObject: any = Object.values(singleApplyKey)[0];
 				let applyKeyType = Object.keys(innerApplykeyObject)[0];
-				let applyKeyField: any = Object.values(innerApplykeyObject)[0];
+				let temp: any = Object.values(innerApplykeyObject)[0];
+				let array: string[] = temp.split("_");
+				let applyKeyField: any = array[1];
 				const result = this.applyKeyCalculation(applyKeyType, applyKeyField, singleArray);
 				finalList[applyKeyName] = result;
 			}
 			return finalList;
 		});
-		return groupByData;
 	}
 
 	private calculateMax (singleArray: any[], key: string): number {

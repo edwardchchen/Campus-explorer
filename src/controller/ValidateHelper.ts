@@ -72,7 +72,7 @@ export default class ValidateHelper {
 			(Object.keys(query)[0] === "WHERE" && Object.keys(query)[1] === "OPTIONS")) {
 			return true;
 		}
-		if ((Object.keys(query).length === 2) &&
+		if ((Object.keys(query).length === 3) &&
 			(Object.keys(query)[0] === "WHERE" && Object.keys(query)[1] === "OPTIONS" &&
 				Object.keys(query)[2] === "TRANSFORMATIONS")) {
 			this.requireTransformation = true;
