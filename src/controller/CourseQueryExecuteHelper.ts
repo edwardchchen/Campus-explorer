@@ -43,7 +43,7 @@ export default class CourseQueryExecuteHelper {
 		let tempDataset: Course[] = [];
 		try{
 			this.filteredDataset = this.filterEachCourse(Object.values(query)[0], dataSet);
-			if (this.filteredDataset.length > 5000) {
+			if (this.filteredDataset.length > 5000 && !this.validateHelper.requireTransformation) {
 				this.reset();
 				return Promise.reject(new ResultTooLargeError(this.filteredDataset.length));
 			}
@@ -56,6 +56,9 @@ export default class CourseQueryExecuteHelper {
 			if (this.validateHelper.requireTransformation) {
 				this.filteredDataset =
 					this.transformationHelper.transformAllQuery(this.validateHelper, this.filteredDataset, query);
+				if (this.filteredDataset.length > 5000) {
+					return Promise.reject(new ResultTooLargeError(this.filteredDataset.length));
+				}
 				this.reset();
 				return Promise.resolve(this.filteredDataset);
 			}
