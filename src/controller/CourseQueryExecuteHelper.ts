@@ -85,6 +85,7 @@ export default class CourseQueryExecuteHelper {
 		this.validateHelper.dataSetField = [];
 		this.validateHelper.orderBy = [];
 		this.validateHelper.requiresOrder = false;
+		this.validateHelper.requireTransformation = false;
 	}
 
 	private addIdIntoFields(courses: Course[]): Course[]{

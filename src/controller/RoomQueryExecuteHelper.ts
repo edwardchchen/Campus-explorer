@@ -89,6 +89,8 @@ export default class CourseQueryExecuteHelper {
 		this.validateHelper.dataSetField = [];
 		this.validateHelper.orderBy = [];
 		this.validateHelper.requiresOrder = false;
+		this.validateHelper.requireTransformation = false;
+		this.validateHelper.validateTransformation.groupByColumns = [];
 	}
 
 	private addIdIntoFields(courses: Room[]): Room[]{
