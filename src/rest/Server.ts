@@ -100,51 +100,63 @@ export default class Server {
 	}
 
 	private static putDS(req: Request, res: Response){
-		let reqJson = req.params;
-		let reqKind = reqJson.kind.slice(1);
-		let id  = reqJson.id.slice(1);
-		let content;
-		let kind;
-		if(reqKind === "rooms"){
-			kind = InsightDatasetKind.Rooms;
-		}else if(reqKind === "courses"){
-			kind = InsightDatasetKind.Courses;
-		}else{
-			res.status(400).json({error: new Error("wrong dataset kind")});
-			return;
-		}
-		content = new (Buffer.alloc as any)(req.body.length,req.body,"base64").toString();
-		Server.insightFacade.addDataset(id,content,kind).then((data) => {
-			res.status(200).json({result: data});
-		}).catch((err)=>{
+		try {
+			let reqJson = req.params;
+			let reqKind = reqJson.kind.slice(1);
+			let id = reqJson.id.slice(1);
+			let content;
+			let kind;
+			if (reqKind === "rooms") {
+				kind = InsightDatasetKind.Rooms;
+			} else if (reqKind === "courses") {
+				kind = InsightDatasetKind.Courses;
+			} else {
+				res.status(400).json({error: new Error("wrong dataset kind")});
+				return;
+			}
+			content = new (Buffer.alloc as any)(req.body.length, req.body, "base64").toString();
+			Server.insightFacade.addDataset(id, content, kind).then((data) => {
+				res.status(200).json({result: data});
+			}).catch((err) => {
+				res.status(400).json({error: err});
+			});
+		}catch(err){
 			res.status(400).json({error: err});
-		});
+		}
 	}
 
 	private static deleteDS(req: Request, res: Response){
-		let reqJson = req.params;
-		let id  = reqJson.id.slice(1);
-		Server.insightFacade.removeDataset(id).then((data) => {
-			res.status(200).json({result: data});
-		}).catch((err)=>{
-			if(err instanceof NotFoundError){
-				res.status(404).json({error: err});
+		try {
+			let reqJson = req.params;
+			let id = reqJson.id.slice(1);
+			Server.insightFacade.removeDataset(id).then((data) => {
+				res.status(200).json({result: data});
+			}).catch((err) => {
+				if (err instanceof NotFoundError) {
+					res.status(404).json({error: err});
 
-			}else{
-				res.status(400).json({error: err});
-			}
-		});
+				} else {
+					res.status(400).json({error: err});
+				}
+			});
+		}catch(err){
+			res.status(400).json({error: err});
+		}
 	}
 
 	private static queryDS(req: Request, res: Response){
-		let query  = req.body;
-		console.log(req);
-		Server.insightFacade.performQuery(query).then((data) => {
-			console.log(data);
-			res.status(200).json({result: data});
-		}).catch((err)=>{
+		try {
+			let query = req.body;
+			console.log(req);
+			Server.insightFacade.performQuery(query).then((data) => {
+				console.log(data);
+				res.status(200).json({result: data});
+			}).catch((err) => {
+				res.status(400).json({error: err});
+			});
+		}catch(err){
 			res.status(400).json({error: err});
-		});
+		}
 
 	}
 
