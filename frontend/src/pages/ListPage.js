@@ -2,7 +2,7 @@ import Typography from "@material-ui/core/Typography";
 import {Button, Container, Divider, FormControl, InputLabel, MenuItem, Select} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import React, {useEffect} from "react";
-import DSTable from "../components/Table";
+import {DSTable} from "../components/Table";
 const axios = require('axios');
 
 const useStyles = makeStyles((theme) => ({
