@@ -4,7 +4,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import React from "react"
 import {coursesQuery,roomsQuery} from "../queries";
 import {Label} from "@material-ui/icons";
-import {QueryTable} from "../components/Table";
+import {QueryTable, RoomQueryTable} from "../components/Table";
 const axios = require('axios');
 
 const useStyles = makeStyles((theme) => ({
@@ -120,6 +120,7 @@ export default function QueryPage(props){
 					</Button>
 				</Grid>
 				<Grid item xs={12}>
+					{/*<RoomQueryTable result={roomResult}/>*/}
 					{JSON.stringify(roomResult)}
 				</Grid>
 			</Grid>

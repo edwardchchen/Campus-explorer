@@ -15,6 +15,11 @@ function createCourseData(courses_year,courses_dept,courses_id, courses_avg, cou
 	return { courses_year,courses_dept,courses_id, courses_avg, courses_instructor,courses_title
 		,courses_pass,courses_fail,courses_audit };
 }
+function createRoomData(rooms_fullname,rooms_shortname,rooms_number, rooms_name, rooms_address,rooms_lat
+	,rooms_lon,rooms_seats,rooms_type,rooms_furniture,rooms_href) {
+	return { rooms_fullname,rooms_shortname,rooms_number, rooms_name, rooms_address,rooms_lat
+		,rooms_lon,rooms_seats,rooms_type,rooms_furniture,rooms_href };
+}
 
 //code modified from https://mui.com/zh/components/tables/
 export function DSTable(props) {
@@ -90,6 +95,57 @@ export function QueryTable(props) {
 							<TableCell align="right">{row.courses_pass}</TableCell>
 							<TableCell align="right">{row.courses_fail}</TableCell>
 							<TableCell align="right">{row.courses_audit}</TableCell>
+
+						</TableRow>
+					))}
+				</TableBody>
+			</Table>
+		</TableContainer>
+	);
+}
+export function RoomQueryTable(props) {
+	const rows = [];
+	props.result.map(x => rows.push(createRoomData(x.rooms_fullname,x.rooms_shortname,x.rooms_number, x.rooms_name, x.rooms_address,x.rooms_lat
+		,x.rooms_lon,x.rooms_seats,x.rooms_type,x.rooms_furniture,x.rooms_href)));
+
+	return (
+		<TableContainer component={Paper}>
+			<Table sx={{ minWidth: 650 }} aria-label="simple table">
+				<TableHead>
+					<TableRow>
+						<TableCell align="right">Fullname</TableCell>
+						<TableCell align="right">Shortname</TableCell>
+						<TableCell align="right">Number</TableCell>
+						<TableCell align="right">Name</TableCell>
+						<TableCell align="right">Address</TableCell>
+						<TableCell align="right">Lat</TableCell>
+						<TableCell align="right">Lon</TableCell>
+						<TableCell align="right">Seats</TableCell>
+						<TableCell align="right">Type</TableCell>
+						<TableCell align="right">Furniture</TableCell>
+						<TableCell align="right">Href</TableCell>
+
+					</TableRow>
+				</TableHead>
+				<TableBody>
+					{rows.map((row) => (
+						<TableRow
+							key={row.rooms_fullname}
+							sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+						>
+							<TableCell component="th" scope="row">
+								{row.rooms_fullname}
+							</TableCell>
+							<TableCell align="right">{row.rooms_shortname}</TableCell>
+							<TableCell align="right">{row.rooms_number}</TableCell>
+							<TableCell align="right">{row.rooms_name}</TableCell>
+							<TableCell align="right">{row.rooms_address}</TableCell>
+							<TableCell align="right">{row.rooms_lat}</TableCell>
+							<TableCell align="right">{row.rooms_lon}</TableCell>
+							<TableCell align="right">{row.rooms_seats}</TableCell>
+							<TableCell align="right">{row.rooms_type}</TableCell>
+							<TableCell align="right">{row.rooms_furniture}</TableCell>
+							<TableCell align="right">{row.rooms_href}</TableCell>
 
 						</TableRow>
 					))}
