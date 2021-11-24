@@ -25,7 +25,10 @@ export default class ValidateTransformation {
 				if (!(this.validateGroup(Object.values(query)[0]) && this.validateApply(Object.values(query)[1]))) {
 					return false;
 				} // this is the only case for true
-				if (this.allColumns !== this.validateHelper.allColumnField) {
+				// if (this.allColumns !== this.validateHelper.allColumnField) {
+				// 	return false;
+				// }
+				if (JSON.stringify(this.allColumns) !== JSON.stringify(this.validateHelper.allColumnField)) {
 					return false;
 				}
 				return true;
@@ -52,6 +55,18 @@ export default class ValidateTransformation {
 		}
 	}
 
+	public isFieldObject(object: any): boolean { // check if the query is a valid object
+		if (typeof object !== "object") { // should be an object
+			return false;
+		} else if (object === undefined) { // shouldn't be undefined
+			return false;
+		} else if (object === null) { // cannot be a null type
+			return false;
+		} else {
+			return true;
+		}
+	}
+
 	public validateGroup(group: any): boolean {
 		if (group instanceof Array) {
 			for (let singleGroupBy of group) {
@@ -59,16 +74,21 @@ export default class ValidateTransformation {
 					this.groupByColumns.push(singleGroupBy); // might not run here because transformation column doesn't exist in groupby
 					this.allColumns.push(singleGroupBy);
 				} else if (this.validateAttribute(singleGroupBy)) { // break into array of two by "_" and check array[1]
-					this.groupByColumns.push(singleGroupBy);
-					this.allColumns.push(singleGroupBy);
+					let array: string[] = singleGroupBy.split("_");
+					let attribute: string = array[1];
+					this.groupByColumns.push(attribute);
+					this.allColumns.push(attribute);
 				} else {
 					return false;
 				}
 			}
-			if (this.groupByColumns !== this.validateHelper.dataSetField) {
-				// If a GROUP is present, all COLUMNS terms must correspond to either GROUP keys or to applykeys defined in the APPLY block.
+			if (JSON.stringify(this.groupByColumns) !== JSON.stringify(this.validateHelper.dataSetField)) {
 				return false;
 			}
+			// if (this.groupByColumns !== this.validateHelper.dataSetField) {
+			// 	// If a GROUP is present, all COLUMNS terms must correspond to either GROUP keys or to applykeys defined in the APPLY block.
+			// 	return false;
+			// }
 			return true;
 		} else {
 			return false;
@@ -120,7 +140,7 @@ export default class ValidateTransformation {
 		} else if (!this.validateHelper.transformationColumn.includes(Object.keys(inner)[0])) {
 			return false;
 		} else {
-			if (!this.validateApplyFieldsAndIDAttributeField(Object.values(inner))) {
+			if (!this.validateApplyFieldsAndIDAttributeField(Object.values(inner)[0])) {
 				return false;
 			} else {
 				this.allColumns.push(Object.keys(inner)[0]);
