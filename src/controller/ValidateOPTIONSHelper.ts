@@ -100,7 +100,7 @@ export default class ValidateOPTIONSHelper {
 
 	public validateOrderField(order: any): boolean {
 		// if (typeof order === "string") { // should now be an array
-		if (typeof order === "object") { // do we must have it be length of 2? or can it be one?
+		if (this.isQueryObject(order)) { // do we must have it be length of 2? or can it be one?
 			if ((Object.keys(order).length === 2) && (Object.keys(order)[0] === "dir"
 				&& Object.keys(order)[1] === "keys")) {
 				if (!this.validateOrderDir(Object.values(order)[0])) {
