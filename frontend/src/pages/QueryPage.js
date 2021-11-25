@@ -4,6 +4,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import React from "react"
 import {coursesQuery,roomsQuery} from "../queries";
 import {Label} from "@material-ui/icons";
+import {QueryTable, RoomQueryTable} from "../components/Table";
 const axios = require('axios');
 
 const useStyles = makeStyles((theme) => ({
@@ -29,6 +30,12 @@ export default function QueryPage(props){
 		queryInJson.WHERE.AND[1].IS.courses_dept = courseDep
 		queryInJson.WHERE.AND[2].EQ.courses_year = parseInt(courseYear)
 		axios.post('http://localhost:4321/query', queryInJson).then(res => {
+			for(let i =0;i<res.data.result.length;i++){
+				console.log(res.data.result[i])
+				if(res.data.result[i].courses_instructor === ""){
+					delete res.data.result[i]
+				}
+			}
 			setCourseResult(res.data.result)
 			console.log(res.data.result);
 		});
@@ -84,7 +91,7 @@ export default function QueryPage(props){
 					</Button>
 				</Grid>
 				<Grid item xs={12}>
-					{JSON.stringify(courseResult)}
+					<QueryTable result={courseResult}/>
 				</Grid>
 			</Grid>
 			<Typography align={'left'} variant="h4">
@@ -113,6 +120,7 @@ export default function QueryPage(props){
 					</Button>
 				</Grid>
 				<Grid item xs={12}>
+					{/*<RoomQueryTable result={roomResult}/>*/}
 					{JSON.stringify(roomResult)}
 				</Grid>
 			</Grid>
