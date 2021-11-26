@@ -2,7 +2,7 @@ import ValidateHelper from "./ValidateHelper";
 import Icourse from "./Icourse";
 import {Course} from "./Course";
 import {InsightDataset, InsightError, ResultTooLargeError} from "./IInsightFacade";
-import QueryTransformationHelper from "./QueryTransformationHelper";
+import CourseQueryTransformationHelper from "./CourseQueryTransformationHelper";
 
 // https://stackoverflow.com/questions/1584370/how-to-merge-two-arrays-in-javascript-and-de-duplicate-items
 export default class CourseQueryExecuteHelper {
@@ -15,13 +15,13 @@ export default class CourseQueryExecuteHelper {
 	private validateHelper: ValidateHelper;
 	private columnRequiredToBeRemoved: string[];
 	private passedInDataset: Course[];
-	private transformationHelper!: QueryTransformationHelper;
+	private transformationHelper!: CourseQueryTransformationHelper;
 
 	constructor() {
 		this.filteredDataset = [];
 		this.id = "";
 		this.passedInDataset = [];
-		this.transformationHelper = new QueryTransformationHelper();
+		this.transformationHelper = new CourseQueryTransformationHelper();
 		this.columnRequiredToBeRemoved = [];
 		this.validateHelper = new ValidateHelper();
 	}
@@ -85,6 +85,7 @@ export default class CourseQueryExecuteHelper {
 		this.validateHelper.dataSetField = [];
 		this.validateHelper.orderBy = [];
 		this.validateHelper.requiresOrder = false;
+		this.validateHelper.requireTransformation = false;
 	}
 
 	private addIdIntoFields(courses: Course[]): Course[] {

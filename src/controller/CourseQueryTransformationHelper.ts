@@ -5,7 +5,7 @@ import {InsightDataset, InsightError, ResultTooLargeError} from "./IInsightFacad
 import Decimal from "decimal.js";
 
 
-export default class QueryTransformationHelper {
+export default class CourseQueryTransformationHelper {
 
 	private passedInDataset: Course[];
 	private groupByMap!: Map<string[], Course[]>;
