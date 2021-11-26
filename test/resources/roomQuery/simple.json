@@ -19,5 +19,5 @@
 			}
 		}
 	},
-	"with": [{"result":[{"rooms_fullname":"Hugh Dempster Pavilion","rooms_seats":160},{"rooms_fullname":"West Mall Swing Space","rooms_seats":27}]}]
+	"with": [{"rooms_fullname":"Hugh Dempster Pavilion","rooms_seats":160},{"rooms_fullname":"West Mall Swing Space","rooms_seats":27}]
 }
