@@ -49,9 +49,10 @@ export default class ValidateOPTIONSHelper {
 				if (!this.validateAttribute(singleAttribute)) {
 					if (this.validateHelperTemp.requireTransformation) {
 						if (!this.validateHelperTemp.transformationColumn.includes(singleAttribute)) {
-							this.validateHelperTemp.transformationColumn.push(singleAttribute);
-							this.validateHelperTemp.allColumnField.push(singleAttribute); // pushing the unrecognizable attribute into columnField for future use
-							return true;
+							if (singleAttribute !== "") {
+								this.validateHelperTemp.transformationColumn.push(singleAttribute);
+								this.validateHelperTemp.allColumnField.push(singleAttribute); // pushing the unrecognizable attribute into columnField for future use
+							}
 						} else {
 							return false; // there is duplicate in naming
 						}
@@ -155,8 +156,10 @@ export default class ValidateOPTIONSHelper {
 		if (keys instanceof Array) {
 			for (let singleKey of keys) {
 				if (this.validateHelperTemp.transformationColumn.includes(singleKey)){
-					this.validateHelperTemp.requiresOrder = true;
-					this.validateHelperTemp.orderBy.push(singleKey);
+					if (singleKey !== "") {
+						this.validateHelperTemp.requiresOrder = true;
+						this.validateHelperTemp.orderBy.push(singleKey);
+					}
 				} else {
 					let array: string[];
 					array = singleKey.split("_");
