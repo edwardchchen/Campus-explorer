@@ -3,7 +3,7 @@ import JSZip from "jszip";
 import {Course} from "./Course";
 import {Room} from "./Room";
 import GeoHelper, {GeoResponse} from "./GeoHelper";
-
+import ObjectConverter from "./ObjectConverter";
 export default class DataStore{
 	public dataSets: InsightDataset[]
 	public dataMap: Map<string, Course[]> = new Map<string, Course[]>();
@@ -24,35 +24,6 @@ export default class DataStore{
 			return false;
 		}
 		return JSON.parse(json).result.length > 0;
-	}
-
-	private static isValidCourse(course: any): boolean {
-		return course.Subject !== null && course.Section !== null && course.Avg !== null && course.Professor !== null
-			&& course.Title !== null && course.Pass !== null
-			&& course.Fail !== null && course.Audit !== null && course.id !== null && course.Year !== null
-			&& course.Professor !== "";
-
-	}
-
-	private static convertJsonCourseIntoCourse(course: any) {
-		if(DataStore.isValidCourse(course)){
-			const c: Course = {
-				dept: course.Subject, // changed them to public instead of private, but you can add helper function later instead
-				id: course.Course,
-				avg: course.Avg,
-				instructor: course.Professor,
-				title: course.Title,
-				pass: course.Pass,
-				fail: course.Fail,
-				audit: course.Audit,
-				uuid: String(course.id),
-				year: parseInt(course.Year, 10),
-			};
-			return c;
-		}
-
-		return null;
-
 	}
 
 	private static isIdInvalid(id: string){
@@ -118,29 +89,12 @@ export default class DataStore{
 			if(!this.requiredBuildings.has(shortname)){
 				return res;
 			}
-			res.push(DataStore.convertIntoRoom(buildingName,shortname,number,name,address,
+			res.push(ObjectConverter.convertIntoRoom(buildingName,shortname,number,name,address,
 				Number(seats),String(type),String(furniture),href));
 		}
 		return res;
 	}
 
-	private static convertIntoRoom(fullname: string, shortname: string, number: string, name: string, address: string,
-		seats: number, type: string, furniture: string, href: string): Room{
-		return {
-			fullname: fullname,
-			shortname: shortname,
-			number: number,
-			name: name,
-			address: address,
-			seats: seats,
-			type: type,
-			furniture: furniture,
-			href: href,
-			lat: 0,
-			lon: 0
-		};
-
-	}
 
 	public callApi(roomArray: Room[] | undefined): any {
 		const promises: any[] = [];
@@ -226,7 +180,7 @@ export default class DataStore{
 		if(DataStore.isValidJson(value)) {
 			let courseArray = JSON.parse(value).result;
 			courseArray.forEach((course: any) => {
-				let parsed = DataStore.convertJsonCourseIntoCourse(course);
+				let parsed = ObjectConverter.convertJsonCourseIntoCourse(course);
 				if(parsed !== null){
 					jsonArray.push(parsed);
 				}
@@ -296,5 +250,4 @@ export default class DataStore{
 	public listDatasets(): Promise<InsightDataset[]> {
 		return Promise.resolve(this.dataSets);
 	}
-
 }

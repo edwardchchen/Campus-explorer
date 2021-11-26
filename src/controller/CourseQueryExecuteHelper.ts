@@ -256,6 +256,22 @@ export default class CourseQueryExecuteHelper {
 			}
 		}
 		return first;
+	}
+
+	private customCompareDescending(a: any, b: any): number {
+		let first = this.determineScoreDescending(this.validateHelper.orderBy[0], a, b);
+		if (first === 0) {
+			for (let i = 1; i < this.validateHelper.orderBy.length; i++) {
+				let score = this.determineScoreDescending(this.validateHelper.orderBy[i], a, b);
+				if (score !== 0) {
+					return score;
+				}
+				if (score === 0 && i === this.validateHelper.orderBy.length - 1) {
+					return score;
+				}
+			}
+		}
+		return first;
 
 	}
 
@@ -266,6 +282,9 @@ export default class CourseQueryExecuteHelper {
 			});
 			return this.filteredDataset;
 		} else {
+			this.filteredDataset.sort((a, b) => {
+				return this.customCompareDescending(a, b);
+			});
 			return this.filteredDataset;
 		}
 	}
