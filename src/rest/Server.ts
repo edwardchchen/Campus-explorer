@@ -148,7 +148,7 @@ export default class Server {
 	private static queryDS(req: Request, res: Response){
 		try {
 			let query = req.body;
-			console.log(req);
+			console.log(query);
 			Server.insightFacade.performQuery(query).then((data) => {
 				console.log(data);
 				res.status(200).json({result: data});
