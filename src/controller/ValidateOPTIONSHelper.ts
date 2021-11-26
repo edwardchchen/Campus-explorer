@@ -56,8 +56,9 @@ export default class ValidateOPTIONSHelper {
 						} else {
 							return false; // there is duplicate in naming
 						}
+					} else {
+						return false;
 					}
-					return false;
 				}
 			}
 		}
