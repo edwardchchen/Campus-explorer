@@ -29,7 +29,8 @@ export default class DataStore{
 	private static isValidCourse(course: any): boolean {
 		return course.Subject !== null && course.Section !== null && course.Avg !== null && course.Professor !== null
 			&& course.Title !== null && course.Pass !== null
-			&& course.Fail !== null && course.Audit !== null && course.id !== null && course.Year !== null;
+			&& course.Fail !== null && course.Audit !== null && course.id !== null && course.Year !== null
+			&& course.Professor !== "";
 
 	}
 

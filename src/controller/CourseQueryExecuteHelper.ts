@@ -41,7 +41,7 @@ export default class CourseQueryExecuteHelper {
 		this.columnsNotIncluded();
 		this.passedInDataset = dataSet;
 		let tempDataset: Course[] = [];
-		try{
+		try {
 			this.filteredDataset = this.filterEachCourse(Object.values(query)[0], dataSet);
 			if (this.filteredDataset.length > 5000 && !this.validateHelper.requireTransformation) {
 				this.reset();
@@ -50,7 +50,7 @@ export default class CourseQueryExecuteHelper {
 			for (let singleCourse of this.filteredDataset) {
 				let copiedSingleCourse: Course = JSON.parse(JSON.stringify(singleCourse));
 				this.deleteField(copiedSingleCourse); // make sure it is the copied course
-				tempDataset.push (copiedSingleCourse);
+				tempDataset.push(copiedSingleCourse);
 			}
 			this.filteredDataset = tempDataset;
 			if (this.validateHelper.requireTransformation) {
@@ -65,7 +65,7 @@ export default class CourseQueryExecuteHelper {
 			if (this.validateHelper.requiresOrder) {
 				this.filteredDataset = this.orderSort();
 				this.filteredDataset = this.addIdIntoFields(this.filteredDataset);
-				this.reset();
+				// this.reset();
 				return Promise.resolve(this.filteredDataset);
 			} else {
 				this.filteredDataset = this.addIdIntoFields(this.filteredDataset);
@@ -73,7 +73,7 @@ export default class CourseQueryExecuteHelper {
 				return Promise.resolve(this.filteredDataset);
 			}
 
-		}catch (e){
+		} catch (e) {
 			this.reset();
 			return Promise.reject(new InsightError());
 		}
@@ -87,17 +87,17 @@ export default class CourseQueryExecuteHelper {
 		this.validateHelper.requiresOrder = false;
 	}
 
-	private addIdIntoFields(courses: Course[]): Course[]{
+	private addIdIntoFields(courses: Course[]): Course[] {
 		let keys: string[];
 		let oldKeys: string[];
-		if(courses.length > 0){
+		if (courses.length > 0) {
 			keys = Object.keys(courses[0]);
 			oldKeys = Object.keys(courses[0]);
-			for(let i = 0;i < keys.length;i++){
+			for (let i = 0; i < keys.length; i++) {
 				keys[i] = this.id + "_" + keys[i];
 			}
-			for(const element of courses){
-				for(let j = 0;j < keys.length;j++){
+			for (const element of courses) {
+				for (let j = 0; j < keys.length; j++) {
 					element[keys[j]] = element[oldKeys[j]];
 					delete element[oldKeys[j]];
 				}
@@ -108,7 +108,7 @@ export default class CourseQueryExecuteHelper {
 	}
 
 
-	private ANDHelper (queryField: any, curDataSet: Course[], innerLTStatement: any): Course[] {
+	private ANDHelper(queryField: any, curDataSet: Course[], innerLTStatement: any): Course[] {
 		let finalFilteredDataset: Course [] = curDataSet;
 		for (let keys of innerLTStatement) {
 			finalFilteredDataset = this.filterEachCourse(keys, finalFilteredDataset);
@@ -116,7 +116,7 @@ export default class CourseQueryExecuteHelper {
 		return finalFilteredDataset;
 	}
 
-	private ORHelper (queryField: any, curDataSet: Course[], innerLTStatement: any): Course[] {
+	private ORHelper(queryField: any, curDataSet: Course[], innerLTStatement: any): Course[] {
 		let combinedDataset: Course[] = [];
 		for (let keys of innerLTStatement) {
 			let tempDataset = this.filterEachCourse(keys, curDataSet);
@@ -125,7 +125,7 @@ export default class CourseQueryExecuteHelper {
 		return combinedDataset;
 	}
 
-	private NOTHelper (queryField: any, curDataSet: Course[], innerLTStatement: any): Course[] {
+	private NOTHelper(queryField: any, curDataSet: Course[], innerLTStatement: any): Course[] {
 		let listRequiredToNotBeIncluded = this.filterEachCourse(Object.values(queryField)[0], curDataSet);
 		let filteredArray: Course[];
 		filteredArray = this.passedInDataset.filter((x) => !listRequiredToNotBeIncluded.includes(x));
@@ -186,7 +186,7 @@ export default class CourseQueryExecuteHelper {
 			}
 			return filteredListCourses;
 		} else if (key === "GT") {
-			return this.GTHelper(curDataSet,attribute,num,filteredListCourses);
+			return this.GTHelper(curDataSet, attribute, num, filteredListCourses);
 			// for (let singleCourse of curDataSet) {
 			// 	if (singleCourse[attribute] > num) {
 			// 		let copiedSingleCourse: Course = singleCourse;
@@ -207,7 +207,7 @@ export default class CourseQueryExecuteHelper {
 		}
 	}
 
-	private GTHelper(curDataSet: any,attribute: any,num: any,filteredListCourses: any): any{
+	private GTHelper(curDataSet: any, attribute: any, num: any, filteredListCourses: any): any {
 		for (let singleCourse of curDataSet) {
 			if (singleCourse[attribute] > num) {
 				// let copiedSingleCourse: Course = JSON.parse(JSON.stringify(singleCourse));
@@ -225,41 +225,47 @@ export default class CourseQueryExecuteHelper {
 		}
 	}
 
-	private orderSort(): Course[] { // sorts the Course[] based on if it is comparing num or string
-		if("" === this.validateHelper.orderDirection || this.validateHelper.orderDirection === "UP" ){
-			for(const attribute  of this.validateHelper.orderBy){
-				if (this.whereMathField.includes(attribute)) {
-					// sort in ascending order
-					this.filteredDataset.sort((a, b) =>{
-						return a[attribute] - b[attribute];
-					});
-					return this.filteredDataset;
-				} else if (this.whereStringField.includes(attribute)) {
-					// sort by a-z
-					this.filteredDataset.sort((a, b) =>{
-						return a[attribute].localeCompare(b[attribute]);
-					});
-					return this.filteredDataset;
+	private determineScoreAscending(attribute: any, a: any, b: any) {
+		if (this.whereMathField.includes(attribute)) {
+			return a[attribute] - b[attribute];
+		} else if (this.whereStringField.includes(attribute)) {
+			return a[attribute].localeCompare(b[attribute]);
+		}
+	}
+
+	private determineScoreDescending(attribute: any, a: any, b: any) {
+		if (this.whereMathField.includes(attribute)) {
+			return b[attribute] - a[attribute];
+		} else if (this.whereStringField.includes(attribute)) {
+			return b[attribute].localeCompare(a[attribute]);
+		}
+	}
+
+	private customCompareAscending(a: any, b: any): number {
+		let first = this.determineScoreAscending(this.validateHelper.orderBy[0], a, b);
+		if (first === 0) {
+			for (let i = 1; i < this.validateHelper.orderBy.length; i++) {
+				let score = this.determineScoreAscending(this.validateHelper.orderBy[i], a, b);
+				if (score !== 0) {
+					return score;
 				}
-			}
-		}else if(this.validateHelper.orderDirection === "DOWN"){
-			for(const attribute  of this.validateHelper.orderBy){
-				if (this.whereMathField.includes(attribute)) {
-					// sort in ascending order
-					this.filteredDataset.sort((a, b) =>{
-						return b[attribute] - a[attribute];
-					});
-					return this.filteredDataset;
-				} else if (this.whereStringField.includes(attribute)) {
-					// sort by a-z
-					this.filteredDataset.sort((a, b) =>{
-						return b[attribute].localeCompare(a[attribute]);
-					});
-					return this.filteredDataset;
+				if (score === 0 && i === this.validateHelper.orderBy.length - 1) {
+					return score;
 				}
 			}
 		}
-		return this.filteredDataset;
+		return first;
+
 	}
 
+	private orderSort(): Course[] {
+		if ("" === this.validateHelper.orderDirection || this.validateHelper.orderDirection === "UP") {
+			this.filteredDataset.sort((a, b) => {
+				return this.customCompareAscending(a, b);
+			});
+			return this.filteredDataset;
+		} else {
+			return this.filteredDataset;
+		}
+	}
 }
