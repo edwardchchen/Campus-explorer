@@ -32,20 +32,20 @@ describe("Facade D3", function () {
 		roomBuffer = fs.readFileSync(datasetsToLoad["rooms"]);
 
 		// TODO: start server here once and handle errors properly
-		// server.start().then((res)=>{
-		// 	console.log(res);
-		// }).catch((e)=>{
-		// 	console.log(e);
-		// });
+		server.start().then((res)=>{
+			console.log(res);
+		}).catch((e)=>{
+			console.log(e);
+		});
 	});
 
 	after(function () {
 		// TODO: stop server here once!
-		// server.stop().then((res)=>{
-		// 	console.log(res);
-		// }).catch((e)=>{
-		// 	console.log(e);
-		// });
+		server.stop().then((res)=>{
+			console.log(res);
+		}).catch((e)=>{
+			console.log(e);
+		});
 	});
 
 	beforeEach(function () {
@@ -59,7 +59,9 @@ describe("Facade D3", function () {
 	// Sample on how to format PUT requests
 	it("PUT test for courses dataset", function () {
 		try {
-			console.log(dsBuffer);
+			// console.log(dsBuffer);
+			// fs.writeFileSync("roomBuffer.txt", roomBuffer.toString());
+			// console.log(fs.readFileSync("roomBuffer.txt"));
 			return chai.request(SERVER_URL)
 				.put("/dataset/id/courses")
 				.send(dsBuffer)
