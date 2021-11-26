@@ -32,6 +32,8 @@ export default function QueryPage(props){
 		axios.post('http://localhost:4321/query', queryInJson).then(res => {
 			setCourseResult(res.data.result)
 			console.log(res.data.result);
+		}).catch(err=>{
+			alert("Dataset not added, please go add dataset")
 		});
 
 
@@ -44,6 +46,8 @@ export default function QueryPage(props){
 		axios.post('http://localhost:4321/query', queryInJson).then(res => {
 			setRoomResult(res.data.result)
 			console.log(res.data.result);
+		}).catch(err=>{
+			alert("Dataset not added, please go add dataset")
 		});
 
 	}

@@ -105,7 +105,6 @@ export function QueryTable(props) {
 }
 export function RoomQueryTable(props) {
 	const rows = [];
-	console.log(props.result)
 	props.result.map(x => rows.push(createRoomData(x.rooms_fullname,x.rooms_shortname,x.rooms_number, x.rooms_name, x.rooms_address,x.rooms_lat
 		,x.rooms_lon,x.rooms_seats,x.rooms_type,x.rooms_furniture,x.rooms_href)));
 
