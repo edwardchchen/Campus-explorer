@@ -64,7 +64,7 @@ export default class DataStore{
 		if(DataStore.isIdInvalid(id)) {
 			return true;
 		}
-		if(this.dataMap.get(id)) {
+		if(this.dataMap.get(id) || this.roomMap.get(id)) {
 			return true;
 		}
 	}

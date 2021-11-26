@@ -14,7 +14,6 @@ import {makeStyles} from '@material-ui/core/styles';
 import React from "react";
 import courses from "../datasets/courses";
 import rooms from "../datasets/rooms";
-const fs = require('fs');
 const useStyles = makeStyles((theme) => ({
 	title:{
 		fontWeight: 500,
@@ -66,11 +65,23 @@ export default function EditPage(props){
 	const clearRemove =()=>{
 		setDataSetToRemove("")
 	}
+	//code taken from https://stackoverflow.com/questions/21797299/convert-base64-string-to-arraybuffer
+	function base64ToArrayBuffer(base64) {
+		var binary_string = window.atob(base64);
+		var len = binary_string.length;
+		var bytes = new Uint8Array(len);
+		for (var i = 0; i < len; i++) {
+			bytes[i] = binary_string.charCodeAt(i);
+		}
+		return bytes.buffer;
+	}
+
 
 	const handleAdd = () => {
-		let url = "http://localhost:4321/dataset/:"+datasetToAdd+"/:"+datasetKind
-		console.log(url)
+		let url = "http://localhost:4321/dataset/"+datasetKind+"/"+datasetKind
 		let content = datasetKind === "rooms" ? rooms : courses;
+		content = base64ToArrayBuffer(content);
+
 		axios.put(
 			url,
 			content,
@@ -82,10 +93,10 @@ export default function EditPage(props){
 			}).catch((err)=>{
 			if(err.response){
 				console.log(err)
-				alert("Invalid dataset id")
+				alert("Dataset already exists")
 			}else{
+				console.log("gg")
 				alert(err)
-
 			}
 		});
 	}
@@ -99,17 +110,9 @@ export default function EditPage(props){
 			</Typography>
 			<Divider/>
 			<Grid container spacing={1}>
-				<Grid item xs={3}>
-
-				<TextField  id="outlined-basic"
-							label="DataSet ID" variant="outlined" margin="normal"
-							value={datasetToAdd}
-							onChange={(event)=>setDataSetToAdd(event.target.value)}
-				/>
-				</Grid>
-				<Grid item xs={3}>
+				<Grid item xs={6}>
 				<FormControl fullWidth>
-				<InputLabel className={classes.textField} id="select">Kind</InputLabel>
+				<InputLabel id="select">Kind</InputLabel>
 				<Select
 
 					labelId="demo-simple-select-label"
@@ -123,23 +126,10 @@ export default function EditPage(props){
 				</Select>
 			</FormControl>
 				</Grid>
-				{/*<Grid item xs={3}>*/}
-
-				{/*<Button className={classes.button} color='primary'*/}
-				{/*	variant="contained"*/}
-				{/*	component="label"*/}
-				{/*>*/}
-				{/*	Upload File*/}
-				{/*	<input*/}
-				{/*		type="file"*/}
-				{/*		hidden*/}
-				{/*	/>*/}
-				{/*</Button>*/}
-				{/*</Grid>*/}
 				<Grid item xs={3}>
 					<Button className={classes.button}
 							color='primary' size='medium' variant='contained'
-							onClick={handleAdd} disabled={(datasetKind.length===0 || datasetToAdd.length===0)}>
+							onClick={handleAdd} disabled={(datasetKind.length===0)}>
 						Submit
 					</Button>
 				</Grid>
@@ -151,9 +141,18 @@ export default function EditPage(props){
 			</Typography>
 			<Divider/>
 			<Grid container spacing={1}>
-				<Grid item xs={3}>
-					<TextField  id="outlined-basic" label="DataSet ID" variant="outlined" margin="normal"
-					onChange={(event)=>setDataSetToRemove(event.target.value)}/>
+				<Grid item xs={6}>
+					<FormControl fullWidth>
+						<InputLabel id="select">Kind</InputLabel>
+						<Select
+							value={datasetToRemove}
+							onChange={(event)=>setDataSetToRemove(event.target.value)}
+
+						>
+							<MenuItem value={"courses"}>Courses</MenuItem>
+							<MenuItem value={"rooms"}>Rooms</MenuItem>
+						</Select>
+					</FormControl>
 				</Grid>
 
 				<Grid item xs={3}>

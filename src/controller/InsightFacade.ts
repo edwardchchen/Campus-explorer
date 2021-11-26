@@ -28,7 +28,6 @@ export default class InsightFacade implements IInsightFacade {
 			return Promise.resolve(this.dataStore.addRoomDataset(id, content, kind)).then((r) => {
 				return this.dataStore.callApi(this.dataStore.roomMap.get(id)).then((e: any)=>{
 					return r;
-
 				});
 			});
 		}
