@@ -231,41 +231,67 @@ export default class CourseQueryExecuteHelper {
 		}
 	}
 
-	private orderSort(): Room[] { // sorts the Room[] based on if it is comparing num or string
-		if("" === this.validateHelper.orderDirection || this.validateHelper.orderDirection === "UP" ){
-			for(const attribute  of this.validateHelper.orderBy){
-				if (this.whereMathField.includes(attribute)) {
-					// sort in ascending order
-					this.filteredDataset.sort((a, b) =>{
-						return a[attribute] - b[attribute];
-					});
-					return this.filteredDataset;
-				} else if (this.whereStringField.includes(attribute)) {
-					// sort by a-z
-					this.filteredDataset.sort((a, b) =>{
-						return a[attribute].localeCompare(b[attribute]);
-					});
-					return this.filteredDataset;
+	private determineScoreAscending(attribute: any, a: any, b: any) {
+		if (this.whereMathField.includes(attribute)) {
+			return a[attribute] - b[attribute];
+		} else if (this.whereStringField.includes(attribute)) {
+			return a[attribute].localeCompare(b[attribute]);
+		}
+	}
+
+	private determineScoreDescending(attribute: any, a: any, b: any) {
+		if (this.whereMathField.includes(attribute)) {
+			return b[attribute] - a[attribute];
+		} else if (this.whereStringField.includes(attribute)) {
+			return b[attribute].localeCompare(a[attribute]);
+		}
+	}
+
+	private customCompareAscending(a: any, b: any): number {
+		let first = this.determineScoreAscending(this.validateHelper.orderBy[0], a, b);
+		if (first === 0) {
+			for (let i = 1; i < this.validateHelper.orderBy.length; i++) {
+				let score = this.determineScoreAscending(this.validateHelper.orderBy[i], a, b);
+				if (score !== 0) {
+					return score;
 				}
-			}
-		}else if(this.validateHelper.orderDirection === "DOWN"){
-			for(const attribute  of this.validateHelper.orderBy){
-				if (this.whereMathField.includes(attribute)) {
-					// sort in ascending order
-					this.filteredDataset.sort((a, b) =>{
-						return b[attribute] - a[attribute];
-					});
-					return this.filteredDataset;
-				} else if (this.whereStringField.includes(attribute)) {
-					// sort by a-z
-					this.filteredDataset.sort((a, b) =>{
-						return b[attribute].localeCompare(a[attribute]);
-					});
-					return this.filteredDataset;
+				if (score === 0 && i === this.validateHelper.orderBy.length - 1) {
+					return score;
 				}
 			}
 		}
-		return this.filteredDataset;
+		return first;
+	}
+
+	private customCompareDescending(a: any, b: any): number {
+		let first = this.determineScoreDescending(this.validateHelper.orderBy[0], a, b);
+		if (first === 0) {
+			for (let i = 1; i < this.validateHelper.orderBy.length; i++) {
+				let score = this.determineScoreDescending(this.validateHelper.orderBy[i], a, b);
+				if (score !== 0) {
+					return score;
+				}
+				if (score === 0 && i === this.validateHelper.orderBy.length - 1) {
+					return score;
+				}
+			}
+		}
+		return first;
+
+	}
+
+	private orderSort(): Room[] {
+		if ("" === this.validateHelper.orderDirection || this.validateHelper.orderDirection === "UP") {
+			this.filteredDataset.sort((a, b) => {
+				return this.customCompareAscending(a, b);
+			});
+			return this.filteredDataset;
+		} else {
+			this.filteredDataset.sort((a, b) => {
+				return this.customCompareDescending(a, b);
+			});
+			return this.filteredDataset;
+		}
 	}
 
 }

@@ -102,8 +102,8 @@ export default class Server {
 	private static putDS(req: Request, res: Response){
 		try {
 			let reqJson = req.params;
-			let reqKind = reqJson.kind.slice(1);
-			let id = reqJson.id.slice(1);
+			let reqKind = reqJson.kind;
+			let id = reqJson.id;
 			let content;
 			let kind;
 			if (reqKind === "rooms") {
@@ -111,17 +111,18 @@ export default class Server {
 			} else if (reqKind === "courses") {
 				kind = InsightDatasetKind.Courses;
 			} else {
-				res.status(400).json({error: new Error("wrong dataset kind")});
-				return;
+				console.log(req.body);
+				return res.status(400).json({error: "wrong dataset kind"});
 			}
-			content = new (Buffer.alloc as any)(req.body.length, req.body, "base64").toString();
+			console.log(req.body);
+			content = Buffer.from(req.body).toString("base64");
 			Server.insightFacade.addDataset(id, content, kind).then((data) => {
 				res.status(200).json({result: data});
 			}).catch((err) => {
-				res.status(400).json({error: err});
+				res.status(400).json({error: err.toString()});
 			});
-		}catch(err){
-			res.status(400).json({error: err});
+		}catch(err: any){
+			res.status(400).json({error: err.toString()});
 		}
 	}
 
@@ -133,14 +134,14 @@ export default class Server {
 				res.status(200).json({result: data});
 			}).catch((err) => {
 				if (err instanceof NotFoundError) {
-					res.status(404).json({error: err});
+					res.status(404).json({error: err.toString()});
 
 				} else {
-					res.status(400).json({error: err});
+					res.status(400).json({error: err.toString()});
 				}
 			});
-		}catch(err){
-			res.status(400).json({error: err});
+		}catch(err: any){
+			res.status(400).json({error: err.toString()});
 		}
 	}
 
@@ -152,10 +153,10 @@ export default class Server {
 				console.log(data);
 				res.status(200).json({result: data});
 			}).catch((err) => {
-				res.status(400).json({error: err});
+				res.status(400).json({error: err.toString()});
 			});
-		}catch(err){
-			res.status(400).json({error: err});
+		}catch(err: any){
+			res.status(400).json({error: err.toString()});
 		}
 
 	}
@@ -176,8 +177,9 @@ export default class Server {
 			console.log(`Server::echo(..) - params: ${JSON.stringify(req.params)}`);
 			const response = Server.performEcho(req.params.msg);
 			res.status(200).json({result: response});
-		} catch (err) {
-			res.status(400).json({error: err});
+			return res;
+		} catch (err: any) {
+			res.status(400).json({error: err.toString()});
 		}
 	}
 

@@ -1,0 +1,55 @@
+{
+	"title": "simple sum for courses",
+	"input":
+	{
+		"WHERE": {
+			"AND": [
+				{
+					"IS": {
+						"courses_id": "310"
+					}
+				},
+				{
+					"IS": {
+						"courses_dept": "cpsc"
+					}
+				}
+			]
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"courses_dept",
+				"courses_id",
+				"courses_avg",
+				"courses_instructor",
+				"courses_title",
+				"courses_pass",
+				"courses_fail",
+				"courses_audit",
+				"courses_year"
+			],
+			"ORDER": {
+				"dir":"DOWN",
+				"keys":["courses_avg","courses_year"]
+			}
+		}
+	},
+		"OPTIONS": {
+			"COLUMNS": [
+				"courses_dept",
+				"courses_id",
+				"courses_avg",
+				"courses_instructor",
+				"courses_title",
+				"courses_pass",
+				"courses_fail",
+				"courses_audit",
+				"courses_year"
+			],
+			"ORDER": {
+				"dir":"DOWN",
+				"keys":["courses_avg","courses_year"]
+			}
+		},
+	"errorExpected": false,
+	"with":[{"courses_dept":"cpsc","courses_id":"310","courses_avg":84.6,"courses_instructor":"","courses_title":"intr sftwr eng","courses_pass":47,"courses_fail":0,"courses_audit":0,"courses_year":2008},{"courses_dept":"cpsc","courses_id":"310","courses_avg":84.6,"courses_instructor":"","courses_title":"intr sftwr eng","courses_pass":47,"courses_fail":0,"courses_audit":0,"courses_year":1900},{"courses_dept":"cpsc","courses_id":"310","courses_avg":81.88,"courses_instructor":"allen, meghan","courses_title":"intr sftwr eng","courses_pass":31,"courses_fail":1,"courses_audit":0,"courses_year":2010},{"courses_dept":"cpsc","courses_id":"310","courses_avg":81.88,"courses_instructor":"","courses_title":"intr sftwr eng","courses_pass":31,"courses_fail":1,"courses_audit":0,"courses_year":1900},{"courses_dept":"cpsc","courses_id":"310","courses_avg":81.18,"courses_instructor":"baniassad, elisa","courses_title":"intr sftwr eng","courses_pass":162,"courses_fail":3,"courses_audit":0,"courses_year":2015},{"courses_dept":"cpsc","courses_id":"310","courses_avg":81.17,"courses_instructor":"holmes, reid","courses_title":"intr sftwr eng","courses_pass":139,"courses_fail":3,"courses_audit":0,"courses_year":2016},{"courses_dept":"cpsc","courses_id":"310","courses_avg":81.17,"courses_instructor":"","courses_title":"intr sftwr eng","courses_pass":139,"courses_fail":3,"courses_audit":0,"courses_year":1900},{"courses_dept":"cpsc","courses_id":"310","courses_avg":80.35,"courses_instructor":"baniassad, elisa","courses_title":"intr sftwr eng","courses_pass":150,"courses_fail":0,"courses_audit":0,"courses_year":2014},{"courses_dept":"cpsc","courses_id":"310","courses_avg":80.34,"courses_instructor":"allen, meghan","courses_title":"intr sftwr eng","courses_pass":66,"courses_fail":1,"courses_audit":0,"courses_year":2012},{"courses_dept":"cpsc","courses_id":"310","courses_avg":80.34,"courses_instructor":"","courses_title":"intr sftwr eng","courses_pass":66,"courses_fail":1,"courses_audit":0,"courses_year":1900},{"courses_dept":"cpsc","courses_id":"310","courses_avg":80.32,"courses_instructor":"allen, meghan","courses_title":"intr sftwr eng","courses_pass":92,"courses_fail":1,"courses_audit":0,"courses_year":2010},{"courses_dept":"cpsc","courses_id":"310","courses_avg":80.24,"courses_instructor":"wohlstadter, eric","courses_title":"intr sftwr eng","courses_pass":156,"courses_fail":1,"courses_audit":0,"courses_year":2013},{"courses_dept":"cpsc","courses_id":"310","courses_avg":79.5,"courses_instructor":"","courses_title":"intr sftwr eng","courses_pass":306,"courses_fail":0,"courses_audit":0,"courses_year":1900},{"courses_dept":"cpsc","courses_id":"310","courses_avg":79.12,"courses_instructor":"baniassad, elisa","courses_title":"intr sftwr eng","courses_pass":75,"courses_fail":1,"courses_audit":1,"courses_year":2014},{"courses_dept":"cpsc","courses_id":"310","courses_avg":79.12,"courses_instructor":"","courses_title":"intr sftwr eng","courses_pass":75,"courses_fail":1,"courses_audit":2,"courses_year":1900},{"courses_dept":"cpsc","courses_id":"310","courses_avg":79.04,"courses_instructor":"","courses_title":"intr sftwr eng","courses_pass":347,"courses_fail":3,"courses_audit":0,"courses_year":1900},{"courses_dept":"cpsc","courses_id":"310","courses_avg":78.69,"courses_instructor":"palyart-lamarche, marc","courses_title":"intr sftwr eng","courses_pass":156,"courses_fail":0,"courses_audit":0,"courses_year":2014},{"courses_dept":"cpsc","courses_id":"310","courses_avg":78.68,"courses_instructor":"allen, meghan","courses_title":"intr sftwr eng","courses_pass":22,"courses_fail":0,"courses_audit":0,"courses_year":2009},{"courses_dept":"cpsc","courses_id":"310","courses_avg":78.68,"courses_instructor":"","courses_title":"intr sftwr eng","courses_pass":22,"courses_fail":0,"courses_audit":0,"courses_year":1900},{"courses_dept":"cpsc","courses_id":"310","courses_avg":78.32,"courses_instructor":"","courses_title":"intr sftwr eng","courses_pass":154,"courses_fail":7,"courses_audit":0,"courses_year":1900},{"courses_dept":"cpsc","courses_id":"310","courses_avg":78.22,"courses_instructor":"allen, meghan","courses_title":"intr sftwr eng","courses_pass":154,"courses_fail":2,"courses_audit":0,"courses_year":2012},{"courses_dept":"cpsc","courses_id":"310","courses_avg":77.8,"courses_instructor":"","courses_title":"intr sftwr eng","courses_pass":289,"courses_fail":5,"courses_audit":0,"courses_year":1900},{"courses_dept":"cpsc","courses_id":"310","courses_avg":77.78,"courses_instructor":"ernst, neil","courses_title":"intr sftwr eng","courses_pass":101,"courses_fail":0,"courses_audit":0,"courses_year":2011},{"courses_dept":"cpsc","courses_id":"310","courses_avg":77.63,"courses_instructor":"allen, meghan","courses_title":"intr sftwr eng","courses_pass":97,"courses_fail":1,"courses_audit":0,"courses_year":2009},{"courses_dept":"cpsc","courses_id":"310","courses_avg":77.13,"courses_instructor":"baniassad, elisa","courses_title":"intr sftwr eng","courses_pass":185,"courses_fail":0,"courses_audit":0,"courses_year":2015},{"courses_dept":"cpsc","courses_id":"310","courses_avg":77.11,"courses_instructor":"","courses_title":"intr sftwr eng","courses_pass":184,"courses_fail":2,"courses_audit":0,"courses_year":1900},{"courses_dept":"cpsc","courses_id":"310","courses_avg":76.52,"courses_instructor":"","courses_title":"intr sftwr eng","courses_pass":86,"courses_fail":0,"courses_audit":0,"courses_year":2008},{"courses_dept":"cpsc","courses_id":"310","courses_avg":76.31,"courses_instructor":"ernst, neil","courses_title":"intr sftwr eng","courses_pass":83,"courses_fail":2,"courses_audit":0,"courses_year":2011},{"courses_dept":"cpsc","courses_id":"310","courses_avg":75.97,"courses_instructor":"","courses_title":"intr sftwr eng","courses_pass":168,"courses_fail":1,"courses_audit":0,"courses_year":1900},{"courses_dept":"cpsc","courses_id":"310","courses_avg":75.8,"courses_instructor":"","courses_title":"intr sftwr eng","courses_pass":255,"courses_fail":8,"courses_audit":0,"courses_year":1900},{"courses_dept":"cpsc","courses_id":"310","courses_avg":75.72,"courses_instructor":"shepherd, david","courses_title":"intr sftwr eng","courses_pass":90,"courses_fail":2,"courses_audit":0,"courses_year":2007},{"courses_dept":"cpsc","courses_id":"310","courses_avg":75.57,"courses_instructor":"fritz, thomas","courses_title":"intr sftwr eng","courses_pass":62,"courses_fail":6,"courses_audit":0,"courses_year":2010},{"courses_dept":"cpsc","courses_id":"310","courses_avg":75.54,"courses_instructor":"","courses_title":"intr sftwr eng","courses_pass":178,"courses_fail":6,"courses_audit":0,"courses_year":1900},{"courses_dept":"cpsc","courses_id":"310","courses_avg":75.4,"courses_instructor":"","courses_title":"intr sftwr eng","courses_pass":82,"courses_fail":1,"courses_audit":0,"courses_year":2008},{"courses_dept":"cpsc","courses_id":"310","courses_avg":75.14,"courses_instructor":"","courses_title":"intr sftwr eng","courses_pass":166,"courses_fail":4,"courses_audit":0,"courses_year":1900},{"courses_dept":"cpsc","courses_id":"310","courses_avg":74.99,"courses_instructor":"allen, meghan","courses_title":"intr sftwr eng","courses_pass":133,"courses_fail":4,"courses_audit":0,"courses_year":2013},{"courses_dept":"cpsc","courses_id":"310","courses_avg":74.45,"courses_instructor":"shepherd, david","courses_title":"intr sftwr eng","courses_pass":76,"courses_fail":2,"courses_audit":0,"courses_year":2007},{"courses_dept":"cpsc","courses_id":"310","courses_avg":73.16,"courses_instructor":"allen, meghan","courses_title":"intr sftwr eng","courses_pass":81,"courses_fail":5,"courses_audit":0,"courses_year":2009},{"courses_dept":"cpsc","courses_id":"310","courses_avg":72.27,"courses_instructor":"allen, meghan","courses_title":"intr sftwr eng","courses_pass":101,"courses_fail":6,"courses_audit":0,"courses_year":2012}]}
