@@ -63,6 +63,11 @@ export default class CourseQueryExecuteHelper {
 				if (this.filteredDataset.length > 5000) {
 					return Promise.reject(new ResultTooLargeError(this.filteredDataset.length));
 				}
+				if (this.validateHelper.requiresOrder) {
+					this.filteredDataset = this.orderSort();
+
+				}
+
 				this.reset();
 				return Promise.resolve(this.filteredDataset);
 			}
@@ -204,8 +209,6 @@ export default class CourseQueryExecuteHelper {
 		} else { // (key === "LT")
 			for (let singleCourse of curDataSet) {
 				if (singleCourse[attribute] < num) {
-					// let copiedSingleCourse: Room = JSON.parse(JSON.stringify(singleCourse));
-					// this.deleteField(copiedSingleCourse); // make sure it is the copied room
 					filteredListCourses.push(singleCourse);
 				}
 			}
@@ -216,8 +219,6 @@ export default class CourseQueryExecuteHelper {
 	private GTHelper(curDataSet: any,attribute: any,num: any,filteredListCourses: any): any{
 		for (let singleCourse of curDataSet) {
 			if (singleCourse[attribute] > num) {
-				// let copiedSingleCourse: Room = JSON.parse(JSON.stringify(singleCourse));
-				// this.deleteField(copiedSingleCourse);
 				filteredListCourses.push(singleCourse);
 			}
 		}
@@ -236,6 +237,8 @@ export default class CourseQueryExecuteHelper {
 			return a[attribute] - b[attribute];
 		} else if (this.whereStringField.includes(attribute)) {
 			return a[attribute].localeCompare(b[attribute]);
+		} else{
+			return a[attribute] - b[attribute];
 		}
 	}
 
@@ -244,6 +247,8 @@ export default class CourseQueryExecuteHelper {
 			return b[attribute] - a[attribute];
 		} else if (this.whereStringField.includes(attribute)) {
 			return b[attribute].localeCompare(a[attribute]);
+		}else{
+			return b[attribute] - a[attribute];
 		}
 	}
 
@@ -277,7 +282,6 @@ export default class CourseQueryExecuteHelper {
 			}
 		}
 		return first;
-
 	}
 
 	private orderSort(): Room[] {
@@ -293,5 +297,4 @@ export default class CourseQueryExecuteHelper {
 			return this.filteredDataset;
 		}
 	}
-
 }
