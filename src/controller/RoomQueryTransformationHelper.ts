@@ -25,7 +25,8 @@ export default class RoomQueryTransformationHelper {
 		let transformations: any = query["TRANSFORMATIONS"];
 		let dataSetTransform =
 			this.multipleGroupByArray(filteredDataset,validateHelper.validateTransformation.groupByColumns);
-		dataSetTransform = this.transformApply(dataSetTransform, validateHelper.dataSetField, transformations["APPLY"]);
+		dataSetTransform = this.transformApply(dataSetTransform, validateHelper.dataSetField,
+			transformations["APPLY"]);
 		return dataSetTransform;
 	}
 
@@ -71,15 +72,17 @@ export default class RoomQueryTransformationHelper {
 			for (let key of columnDataSetKeys) { // for example if key is dept, then it should be in the single array
 				finalList[this.vh.findID() + "_" + key] = singleArray[0][key];
 			}
-			for (let singleApplyKey of applyKeys) {
-				let applyKeyName = Object.keys(singleApplyKey)[0];
-				let innerApplykeyObject: any = Object.values(singleApplyKey)[0];
-				let applyKeyType = Object.keys(innerApplykeyObject)[0];
-				let temp: any = Object.values(innerApplykeyObject)[0];
-				let array: string[] = temp.split("_");
-				let applyKeyField: any = array[1];
-				const result = this.applyKeyCalculation(applyKeyType, applyKeyField, singleArray);
-				finalList[applyKeyName] = result;
+			if (this.vh.requireApply) {
+				for (let singleApplyKey of applyKeys) {
+					let applyKeyName = Object.keys(singleApplyKey)[0];
+					let innerApplykeyObject: any = Object.values(singleApplyKey)[0];
+					let applyKeyType = Object.keys(innerApplykeyObject)[0];
+					let temp: any = Object.values(innerApplykeyObject)[0];
+					let array: string[] = temp.split("_");
+					let applyKeyField: any = array[1];
+					const result = this.applyKeyCalculation(applyKeyType, applyKeyField, singleArray);
+					finalList[applyKeyName] = result;
+				}
 			}
 			return finalList;
 		});

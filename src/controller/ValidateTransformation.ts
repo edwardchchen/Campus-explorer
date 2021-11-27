@@ -122,13 +122,18 @@ export default class ValidateTransformation {
 	public validateApply(apply: any): boolean {
 		if (apply instanceof Array) {
 			if (apply.length === 0) {
-				return false;
+				if (this.validateHelper.transformationColumn.length >= 1) {
+					return false;
+				}
+				this.validateHelper.requireApply = false;
+				return true;
 			}
 			for (let singleApplyColumn of apply) { // each applyKey in apply
 				if (this.validateInnerApplyColumn(singleApplyColumn) === false) {
 					return false; // The applykeys should be in Transformation column
 				}
 			}
+			this.validateHelper.requireApply = true;
 			return true;
 		} else {
 			return false;

@@ -20,6 +20,7 @@ export default class ValidateHelper {
 	public validateTransformation!: ValidateTransformation;
 	public validateHelperHelper!: ValidateOPTIONSHelper;
 	public orderDirection: string = "";
+	public requireApply: boolean = false;
 	constructor() {
 		this.dataSetField = [];
 		this.allColumnField = [];
