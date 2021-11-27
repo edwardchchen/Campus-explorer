@@ -28,24 +28,24 @@ export default class QueryEngine {
 			let id: string;
 			id = this.validateHelper.findID();
 			if (id === "") {
-				return Promise.reject("id shouldn't be empty");
+				return Promise.reject(new InsightError("id shouldn't be empty"));
 			} else {
 				if (this.validateHelper.isCourseQuery) { // is Course
 					if (this.validateCourseIDwithDataSet(id)) { // validating if the dataset exists with specified ID
 						this.tempCourseDataSets = this.tempDataStore.dataMap;
 						return Promise.resolve(this.courseQueryExecute(id, this.tempCourseDataSets.get(id), query)); // not sure if the resolve works?
 					} else {
-						return Promise.reject("id doesn't exist in dataSets");
+						return Promise.reject(new InsightError("id doesn't exist in dataSets"));
 					}
 				} else if (this.validateHelper.isRoomQuery){ // is ROOM
 					if (this.validateRoomIDwithDataSet(id)) { // validating if the dataset exists with specified ID
 						this.tempRoomDataSets = this.tempDataStore.roomMap;
 						return Promise.resolve(this.roomQueryExecute(id, this.tempRoomDataSets.get(id), query)); // not sure if the resolve works?
 					} else {
-						return Promise.reject("id doesn't exist in dataSets");
+						return Promise.reject(new InsightError("id doesn't exist in dataSets"));
 					}
 				} else {
-					return Promise.reject("error, should be either ROOM or COURSE query");
+					return Promise.reject(new InsightError("error, should be either ROOM or COURSE query"));
 				}
 			}
 		}

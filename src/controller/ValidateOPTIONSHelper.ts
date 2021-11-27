@@ -49,14 +49,16 @@ export default class ValidateOPTIONSHelper {
 				if (!this.validateAttribute(singleAttribute)) {
 					if (this.validateHelperTemp.requireTransformation) {
 						if (!this.validateHelperTemp.transformationColumn.includes(singleAttribute)) {
-							this.validateHelperTemp.transformationColumn.push(singleAttribute);
-							this.validateHelperTemp.allColumnField.push(singleAttribute); // pushing the unrecognizable attribute into columnField for future use
-							return true;
+							if (singleAttribute !== "") {
+								this.validateHelperTemp.transformationColumn.push(singleAttribute);
+								this.validateHelperTemp.allColumnField.push(singleAttribute); // pushing the unrecognizable attribute into columnField for future use
+							}
 						} else {
 							return false; // there is duplicate in naming
 						}
+					} else {
+						return false;
 					}
-					return false;
 				}
 			}
 		}
@@ -100,7 +102,7 @@ export default class ValidateOPTIONSHelper {
 
 	public validateOrderField(order: any): boolean {
 		// if (typeof order === "string") { // should now be an array
-		if (typeof order === "object") { // do we must have it be length of 2? or can it be one?
+		if (this.isQueryObject(order)) { // do we must have it be length of 2? or can it be one?
 			if ((Object.keys(order).length === 2) && (Object.keys(order)[0] === "dir"
 				&& Object.keys(order)[1] === "keys")) {
 				if (!this.validateOrderDir(Object.values(order)[0])) {
@@ -155,8 +157,10 @@ export default class ValidateOPTIONSHelper {
 		if (keys instanceof Array) {
 			for (let singleKey of keys) {
 				if (this.validateHelperTemp.transformationColumn.includes(singleKey)){
-					this.validateHelperTemp.requiresOrder = true;
-					this.validateHelperTemp.orderBy.push(singleKey);
+					if (singleKey !== "") {
+						this.validateHelperTemp.requiresOrder = true;
+						this.validateHelperTemp.orderBy.push(singleKey);
+					}
 				} else {
 					let array: string[];
 					array = singleKey.split("_");

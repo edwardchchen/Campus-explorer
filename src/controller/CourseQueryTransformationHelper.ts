@@ -85,7 +85,7 @@ export default class CourseQueryTransformationHelper {
 	}
 
 	private calculateMax (singleArray: any[], key: string): number {
-		let Max: number = -1; // we are assuming that the array will have at least length 1
+		let Max: number = Number.NEGATIVE_INFINITY; // we are assuming that the array will have at least length 1
 		for (let singleCourse of singleArray) {
 			if (singleCourse[key] > Max) {
 				Max = singleCourse[key];
@@ -95,7 +95,7 @@ export default class CourseQueryTransformationHelper {
 	}
 
 	private calculateMin (singleArray: any[], key: string): number {
-		let Min: number = 101; // we are assuming that the array will have at least length 1
+		let Min: number = Math.pow(10, 1000); // we are assuming that the array will have at least length 1
 		for (let singleCourse of singleArray) {
 			if (singleCourse[key] < Min) {
 				Min = singleCourse[key];

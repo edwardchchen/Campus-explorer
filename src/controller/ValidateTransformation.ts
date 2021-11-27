@@ -69,6 +69,9 @@ export default class ValidateTransformation {
 
 	public validateGroup(group: any): boolean {
 		if (group instanceof Array) {
+			if (group.length === 0) {
+				return false;
+			}
 			for (let singleGroupBy of group) {
 				if (this.validateHelper.transformationColumn.includes(singleGroupBy)) { // I think group cannot have the applyKey, but this can be for applykey validation
 					this.groupByColumns.push(singleGroupBy); // might not run here because transformation column doesn't exist in groupby
