@@ -12,6 +12,8 @@ dist/
 
 # Persist Dir
 data/
+test/resources/squidward/*
+test/resources/debug/*
 
 # Normal Things
 .DS_Store
