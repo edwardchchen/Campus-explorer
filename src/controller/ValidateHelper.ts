@@ -21,6 +21,7 @@ export default class ValidateHelper {
 	public validateHelperHelper!: ValidateOPTIONSHelper;
 	public orderDirection: string = "";
 	public requireApply: boolean = false;
+	public requireWhere: boolean = false;
 	constructor() {
 		this.dataSetField = [];
 		this.allColumnField = [];
@@ -101,7 +102,12 @@ export default class ValidateHelper {
 		} else if (Object.keys(where).length < 1) { // if WHERE is empty should be ok and return true and no filter
 			return true;
 		} else {
-			return this.validateFirstWhereFilters(where); // goes here only if there is something within the WHERE clause
+			if (this.validateFirstWhereFilters(where)) { // goes here only if there is something within the WHERE clause
+				this.requireWhere = true;
+				return true;
+			} else {
+				return false;
+			}
 		}
 	}
 

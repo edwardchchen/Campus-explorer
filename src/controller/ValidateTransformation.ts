@@ -10,6 +10,12 @@ export default class ValidateTransformation {
 	public allColumns: string[] = []; // Fields in Groupby and Apply, to be used to check against the allColumn in ValidateHelper
 	public transformationMap: Map<string, string> = new Map<string, string>();
 	public applyField: string[] = []; // this is to be used to append with the dataSetColumns
+	private applyKeyFieldNames: string[] = [];
+	private allCourseFields: string[] =
+		["avg", "pass", "fail", "audit", "year", "dept", "id", "instructor", "title", "uuid"];
+
+	private allRoomFields: string[] =
+		["lat", "lon", "seats", "fullname", "shortname", "number", "name", "address", "type", "furniture", "href"];
 
 	constructor() {
 		this.applyMathFields = ["MAX", "MIN", "AVG", "SUM"];
@@ -28,9 +34,13 @@ export default class ValidateTransformation {
 				// if (this.allColumns !== this.validateHelper.allColumnField) {
 				// 	return false;
 				// }
-				if (JSON.stringify(this.allColumns) !== JSON.stringify(this.validateHelper.allColumnField)) {
-					return false;
+				for (let field of this.validateHelper.allColumnField) {
+					if (!(this.allColumns.includes(field))) {
+						return false;
+					}
 				}
+
+
 				return true;
 			} else {
 				return false;
@@ -74,8 +84,9 @@ export default class ValidateTransformation {
 			}
 			for (let singleGroupBy of group) {
 				if (this.validateHelper.transformationColumn.includes(singleGroupBy)) { // I think group cannot have the applyKey, but this can be for applykey validation
-					this.groupByColumns.push(singleGroupBy); // might not run here because transformation column doesn't exist in groupby
-					this.allColumns.push(singleGroupBy);
+					return false;
+					// this.groupByColumns.push(singleGroupBy); // might not run here because transformation column doesn't exist in groupby
+					// this.allColumns.push(singleGroupBy);
 				} else if (this.validateAttribute(singleGroupBy)) { // break into array of two by "_" and check array[1]
 					let array: string[] = singleGroupBy.split("_");
 					let attribute: string = array[1];
@@ -85,9 +96,10 @@ export default class ValidateTransformation {
 					return false;
 				}
 			}
-			if (JSON.stringify(this.groupByColumns) !== JSON.stringify(this.validateHelper.dataSetField)) {
-				return false;
-			}
+			// if (JSON.stringify(this.groupByColumns) !== JSON.stringify(this.validateHelper.dataSetField
+			// 	|| JSON.stringify((this.validateHelper.transformationColumn)))) {
+			// 	return false;
+			// }
 			// if (this.groupByColumns !== this.validateHelper.dataSetField) {
 			// 	// If a GROUP is present, all COLUMNS terms must correspond to either GROUP keys or to applykeys defined in the APPLY block.
 			// 	return false;
@@ -110,7 +122,9 @@ export default class ValidateTransformation {
 			if (array[0] !== this.validateHelper.findID()) { // ID shouldn't be "", should contain something
 				return false;
 			} else {
-				if (this.validateHelper.dataSetField.includes(array[1])) {
+				if (this.validateHelper.isCourseQuery && this.allCourseFields.includes(array[1])) {
+					return true;
+				} else if (this.validateHelper.isRoomQuery && this.allRoomFields.includes(array[1])) {
 					return true;
 				} else {
 					return false;
@@ -145,12 +159,16 @@ export default class ValidateTransformation {
 			return false;
 		} else if (!(Object.keys(inner).length === 1)) {
 			return false;
-		} else if (!this.validateHelper.transformationColumn.includes(Object.keys(inner)[0])) {
+		} else if (!this.validateHelper.transformationColumn.includes(Object.keys(inner)[0]) &&
+			this.validateHelper.transformationColumn.length !== 0) {
 			return false;
 		} else {
 			if (!this.validateApplyFieldsAndIDAttributeField(Object.values(inner)[0])) {
 				return false;
 			} else {
+				if (this.allColumns.includes(Object.keys(inner)[0])) {
+					return false;
+				}
 				this.allColumns.push(Object.keys(inner)[0]);
 				return true;
 			}

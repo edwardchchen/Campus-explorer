@@ -28,7 +28,8 @@ export default class CourseQueryExecuteHelper {
 
 	public columnsNotIncluded(): void { // output a list of columns that should be removed in Course due to OPTIONS not specifying them
 		let dataSetFieldPlusApplyField: string[] =
-			[...this.validateHelper.validateTransformation.applyField, ...this.validateHelper.dataSetField];
+			[...this.validateHelper.validateTransformation.applyField, ...this.validateHelper.dataSetField,
+				...this.validateHelper.validateTransformation.groupByColumns];
 		this.columnRequiredToBeRemoved = this.allFields.filter((x) => !dataSetFieldPlusApplyField.includes(x));
 	}
 
@@ -42,7 +43,11 @@ export default class CourseQueryExecuteHelper {
 		this.passedInDataset = dataSet;
 		let tempDataset: Course[] = [];
 		try {
-			this.filteredDataset = this.filterEachCourse(Object.values(query)[0], dataSet);
+			if (this.validateHelper.requireWhere === true) {
+				this.filteredDataset = this.filterEachCourse(Object.values(query)[0], dataSet);
+			} else {
+				this.filteredDataset = dataSet;
+			}
 			if (this.filteredDataset.length > 5000 && !this.validateHelper.requireTransformation) {
 				this.reset();
 				return Promise.reject(new ResultTooLargeError(this.filteredDataset.length));
@@ -121,7 +126,10 @@ export default class CourseQueryExecuteHelper {
 		let combinedDataset: Course[] = [];
 		for (let keys of innerLTStatement) {
 			let tempDataset = this.filterEachCourse(keys, curDataSet);
-			combinedDataset = [...tempDataset, ...combinedDataset]; // destructuring and combining without duplicate
+			combinedDataset = combinedDataset.concat(tempDataset);
+			combinedDataset = [...new Set([...combinedDataset, ...tempDataset])];
+			// combinedDataset = [...combinedDataset, ...tempDataset]; // destructuring and combining without duplicate
+			// https://codeburst.io/how-to-merge-arrays-without-duplicates-in-javascript-91c66e7b74cf
 		}
 		return combinedDataset;
 	}

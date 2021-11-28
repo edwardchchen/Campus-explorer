@@ -183,6 +183,4 @@ describe("InsightFacade", function () {
 			}
 		);
 	});
-
-
 });

@@ -2,6 +2,7 @@ import ValidateHelper from "./ValidateHelper";
 
 export default class ValidateOPTIONSHelper {
 	public validateHelperTemp!: ValidateHelper;
+	public firstTimeRoomOrCourseSet: boolean = false;
 
 	public isQueryObject(object: any): boolean { // check if the query is a valid object
 		if (typeof object !== "object") { // should be an object
@@ -86,6 +87,21 @@ export default class ValidateOPTIONSHelper {
 
 	public checkIfIDandAddAttributeToColumn(array: any[]): boolean {
 		if (this.validateHelperTemp.validateDataSetID(array[0])) {
+			if (!this.validateHelperTemp.requireWhere) {
+				if (!this.firstTimeRoomOrCourseSet) {
+					if (this.validateHelperTemp.whereCourseMathField.includes(array[1]) ||
+						this.validateHelperTemp.whereCourseStringField.includes(array[1])) {
+						this.validateHelperTemp.isCourseQuery = true;
+						this.firstTimeRoomOrCourseSet = true;
+					} else if (this.validateHelperTemp.whereRoomMathField.includes(array[1]) ||
+						this.validateHelperTemp.whereRoomStringField.includes(array[1])) {
+						this.validateHelperTemp.isRoomQuery = true;
+						this.firstTimeRoomOrCourseSet = true;
+					} else {
+						return false;
+					}
+				}
+			}
 			if (this.validateHelperTemp.isCourseQuery &&
 				(this.validateHelperTemp.whereCourseMathField.includes(array[1]) ||
 				this.validateHelperTemp.whereCourseStringField.includes(array[1]))) {

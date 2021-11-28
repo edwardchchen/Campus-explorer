@@ -70,7 +70,7 @@ export default class CourseQueryTransformationHelper {
 			for (let key of columnDataSetKeys) { // for example if key is dept, then it should be in the single array
 				finalList[this.vh.findID() + "_" + key] = singleArray[0][key];
 			}
-			if (this.vh.requireApply) {
+			if (this.vh.requireApply && this.vh.transformationColumn.length !== 0) {
 				for (let singleApplyKey of applyKeys) {
 					let applyKeyName = Object.keys(singleApplyKey)[0];
 					let innerApplykeyObject: any = Object.values(singleApplyKey)[0];
