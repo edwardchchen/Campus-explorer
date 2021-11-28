@@ -15,6 +15,7 @@ data/
 test/resources/squidward/*
 test/resources/debug/*
 test/resources/squidward-courses/*
+test/resources/debug-courses/*
 
 # Normal Things
 .DS_Store

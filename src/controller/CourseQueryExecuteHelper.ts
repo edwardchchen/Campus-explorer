@@ -258,12 +258,13 @@ export default class CourseQueryExecuteHelper {
 					this.validateHelper.orderBy[i] = this.id + "_" + this.validateHelper.orderBy[i];
 				}
 			}
+			this.addIdIntoMathAndStringFields();
+
 		}
 	}
 
 	private orderSort(): Course[] {
 		this.checkTransform();
-		this.addIdIntoMathAndStringFields();
 		if ("" === this.validateHelper.orderDirection || this.validateHelper.orderDirection === "UP") {
 			this.filteredDataset.sort((a, b) => {
 				return this.customCompareAscending(a, b);

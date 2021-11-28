@@ -274,12 +274,12 @@ export default class CourseQueryExecuteHelper {
 				}
 
 			}
+			this.addIdIntoMathAndStringFields();
 		}
 	}
 
 	private orderSort(): Room[] {
 		this.checkTransform();
-		this.addIdIntoMathAndStringFields();
 		if ("" === this.validateHelper.orderDirection || this.validateHelper.orderDirection === "UP") {
 			this.filteredDataset.sort((a, b) => {
 				return this.customCompareAscending(a, b);
