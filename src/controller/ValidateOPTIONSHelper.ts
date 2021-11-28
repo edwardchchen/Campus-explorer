@@ -127,9 +127,10 @@ export default class ValidateOPTIONSHelper {
 				if (!this.validateOrderKeys(Object.values(order)[1])) {
 					return false;
 				}
+				this.validateHelperTemp.requiresOrder = true;
+				return true;
 			}
-			this.validateHelperTemp.requiresOrder = true;
-			return true;
+			return false;
 		} else if (typeof order === "string") {
 			if (this.validateHelperTemp.transformationColumn.includes(order)) {
 				this.validateHelperTemp.requiresOrder = true;
@@ -171,6 +172,9 @@ export default class ValidateOPTIONSHelper {
 
 	public validateOrderKeys (keys: any): boolean {
 		if (keys instanceof Array) {
+			if (keys.length === 0) {
+				return false;
+			}
 			for (let singleKey of keys) {
 				if (this.validateHelperTemp.transformationColumn.includes(singleKey)){
 					if (singleKey !== "") {
