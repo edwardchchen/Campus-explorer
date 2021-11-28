@@ -10,6 +10,8 @@ export default class CourseQueryExecuteHelper {
 	private allFields: string[] =
 		["lat", "lon", "seats", "fullname", "shortname", "number", "name", "address", "type", "furniture", "href"];
 
+	private applyToken: string[] = ["MAX","MIN","AVG","COUNT","SUM"];
+
 	private filteredDataset: Room[];
 	private id: string;
 	private validateHelper: ValidateHelper;
@@ -69,8 +71,8 @@ export default class CourseQueryExecuteHelper {
 				return Promise.resolve(this.filteredDataset);
 			}
 			if (this.validateHelper.requiresOrder) {
-				this.filteredDataset = this.orderSort();
 				this.filteredDataset = this.addIdIntoFields(this.filteredDataset);
+				this.filteredDataset = this.orderSort();
 				this.reset();
 				return Promise.resolve(this.filteredDataset);
 			} else {
@@ -255,7 +257,29 @@ export default class CourseQueryExecuteHelper {
 		return first;
 	}
 
+	private addIdIntoMathAndStringFields(){
+		for(let i = 0; i < this.whereMathField.length;i++){
+			this.whereMathField[i] = this.id + "_" + this.whereMathField[i];
+		}
+		for(let i = 0; i < this.whereStringField.length;i++){
+			this.whereStringField[i] = this.id + "_" + this.whereStringField[i];
+		}
+	}
+
+	private checkTransform(){
+		if(this.validateHelper.requireTransformation && this.validateHelper.requiresOrder){
+			for(let i = 0;i < this.validateHelper.orderBy.length;i++){
+				if(this.allFields.includes(this.validateHelper.orderBy[i])){
+					this.validateHelper.orderBy[i] = this.id + "_" + this.validateHelper.orderBy[i];
+				}
+
+			}
+		}
+	}
+
 	private orderSort(): Room[] {
+		this.checkTransform();
+		this.addIdIntoMathAndStringFields();
 		if ("" === this.validateHelper.orderDirection || this.validateHelper.orderDirection === "UP") {
 			this.filteredDataset.sort((a, b) => {
 				return this.customCompareAscending(a, b);
