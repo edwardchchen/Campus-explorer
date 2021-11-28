@@ -13,7 +13,6 @@ export default class CourseQueryExecuteHelper {
 	private allFields: string[] =
 		["lat", "lon", "seats", "fullname", "shortname", "number", "name", "address", "type", "furniture", "href"];
 
-	// private filteredListofCourses: any[] = [];
 	private filteredDataset: Room[];
 	private id: string;
 	private validateHelper: ValidateHelper;
@@ -58,16 +57,14 @@ export default class CourseQueryExecuteHelper {
 			}
 			this.filteredDataset = tempDataset;
 			if (this.validateHelper.requireTransformation) {
+				if (this.validateHelper.requiresOrder) {
+					this.filteredDataset = this.orderSort();
+				}
 				this.filteredDataset =
 					this.transformationHelper.transformAllQuery(this.validateHelper, this.filteredDataset, query);
 				if (this.filteredDataset.length > 5000) {
 					return Promise.reject(new ResultTooLargeError(this.filteredDataset.length));
 				}
-				if (this.validateHelper.requiresOrder) {
-					this.filteredDataset = this.orderSort();
-
-				}
-
 				this.reset();
 				return Promise.resolve(this.filteredDataset);
 			}
@@ -156,32 +153,16 @@ export default class CourseQueryExecuteHelper {
 		let filteredListCourses: Room[] = [];
 		if (key === "AND") { // it was verified that the length is at least 1
 			return this.ANDHelper(queryField, curDataSet, InnerLTStatement);
-			// let finalFilteredDataset: Room [] = curDataSet;
-			// for (let keys of InnerLTStatement) {
-			// 	finalFilteredDataset = this.filterEachCourse(keys, finalFilteredDataset);
-			// } return finalFilteredDataset;
 		} else if (key === "OR") {
 			return this.ORHelper(queryField, curDataSet, InnerLTStatement);
-			// let combinedDataset: Room[] = [];
-			// for (let keys of InnerLTStatement) {
-			// 	let tempDataset = this.filterEachCourse(keys, curDataSet);
-			// 	combinedDataset = [...tempDataset, ...combinedDataset]; // destructuring and combining without duplicate
-			// } return combinedDataset;
 		} else if (key === "NOT") {
 			return this.NOTHelper(queryField, curDataSet, InnerLTStatement);
-			// let listRequiredToNotBeIncluded = this.filterEachCourse(Object.values(queryField)[0], curDataSet);
-			// let filteredArray: Room[];
-			// filteredArray = this.passedInDataset.filter((x) => !listRequiredToNotBeIncluded.includes(x));
-			// return filteredArray;
 		} else if (key === "IS") {
 			let str: string = Object.values(InnerLTStatement)[0] as string;
 			let Strattribute: string = array[1]; // avg
 			const wildCard = new RegExp(`^${str.replace(/\*/g, "(.)*")}$`);
 			for (let singleCourse of curDataSet) {
-				// if (singleCourse[Strattribute] === wildCard) {
 				if (wildCard.test(singleCourse[Strattribute])) {
-					// let copiedSingleCourse: Room = JSON.parse(JSON.stringify(singleCourse));
-					// this.deleteField(copiedSingleCourse); // make sure it is the copied Room
 					filteredListCourses.push(singleCourse);
 				}
 			}
@@ -189,23 +170,12 @@ export default class CourseQueryExecuteHelper {
 		} else if (key === "EQ") {
 			for (let singleCourse of curDataSet) {
 				if (singleCourse[attribute] === num) {
-					// let copiedSingleCourse: Room = singleCourse;
-					// let copiedSingleCourse: Room = JSON.parse(JSON.stringify(singleCourse));
-					// this.deleteField(copiedSingleCourse); // make sure it is the copied room
 					filteredListCourses.push(singleCourse);
 				}
 			}
 			return filteredListCourses;
 		} else if (key === "GT") {
 			return this.GTHelper(curDataSet,attribute,num,filteredListCourses);
-			// for (let singleCourse of curDataSet) {
-			// 	if (singleCourse[attribute] > num) {
-			// 		let copiedSingleCourse: Room = singleCourse;
-			// 		this.deleteField(copiedSingleCourse);
-			// 		filteredListCourses.push(copiedSingleCourse);
-			// 	}
-			// }
-			// return filteredListCourses;
 		} else { // (key === "LT")
 			for (let singleCourse of curDataSet) {
 				if (singleCourse[attribute] < num) {
