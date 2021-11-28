@@ -71,8 +71,8 @@ export default class CourseQueryExecuteHelper {
 				return Promise.resolve(this.filteredDataset);
 			}
 			if (this.validateHelper.requiresOrder) {
-				this.filteredDataset = this.addIdIntoFields(this.filteredDataset);
 				this.filteredDataset = this.orderSort();
+				this.filteredDataset = this.addIdIntoFields(this.filteredDataset);
 				this.reset();
 				return Promise.resolve(this.filteredDataset);
 			} else {
