@@ -1,10 +1,7 @@
 import ValidateHelper from "./ValidateHelper";
-import {Course} from "./Course";
 import {InsightDataset, InsightError, ResultTooLargeError} from "./IInsightFacade";
-import CourseQueryTransformationHelper from "./CourseQueryTransformationHelper";
 import {Room} from "./Room";
 import RoomQueryTransformationHelper from "./RoomQueryTransformationHelper";
-// https://stackoverflow.com/questions/1584370/how-to-merge-two-arrays-in-javascript-and-de-duplicate-items
 export default class CourseQueryExecuteHelper {
 	private whereMathField: string[] = ["lat", "lon", "seats"];
 	private whereStringField: string[] =
@@ -32,21 +29,24 @@ export default class CourseQueryExecuteHelper {
 
 	public columnsNotIncluded(): void { // output a list of columns that should be removed in Room due to OPTIONS not specifying them
 		let dataSetFieldPlusApplyField: string[] =
-			[...this.validateHelper.validateTransformation.applyField, ...this.validateHelper.dataSetField];
+			[...this.validateHelper.validateTransformation.applyField, ...this.validateHelper.dataSetField,
+				...this.validateHelper.validateTransformation.groupByColumns];
 		this.columnRequiredToBeRemoved = this.allFields.filter((x) => !dataSetFieldPlusApplyField.includes(x));
 	}
 
 
-	public executeAndOrder(id: string, dataSet: Room[], validateHelper: ValidateHelper, query: any): Promise<any> { // return a filtered list of courses
-		// first filter list and then if it is more than 5000 in length reject, otherwise
-		// second if there is order then order by specified column
+	public executeAndOrder(id: string, dataSet: Room[], validateHelper: ValidateHelper, query: any): Promise<any> {// return a filtered list of courses
 		this.id = id;
 		this.validateHelper = validateHelper;
 		this.columnsNotIncluded();
 		this.passedInDataset = dataSet;
 		let tempDataset: Room[] = [];
 		try{
-			this.filteredDataset = this.filterEachCourse(Object.values(query)[0], dataSet);
+			if (this.validateHelper.requireWhere === true) {
+				this.filteredDataset = this.filterEachCourse(Object.values(query)[0], dataSet);
+			} else {
+				this.filteredDataset = dataSet;
+			}
 			if (this.filteredDataset.length > 5000 && !this.validateHelper.requireTransformation) {
 				this.reset();
 				return Promise.reject(new ResultTooLargeError(this.filteredDataset.length));
@@ -65,9 +65,7 @@ export default class CourseQueryExecuteHelper {
 				}
 				if (this.validateHelper.requiresOrder) {
 					this.filteredDataset = this.orderSort();
-
 				}
-
 				this.reset();
 				return Promise.resolve(this.filteredDataset);
 			}
@@ -81,7 +79,6 @@ export default class CourseQueryExecuteHelper {
 				this.reset();
 				return Promise.resolve(this.filteredDataset);
 			}
-
 		}catch (e){
 			this.reset();
 			return Promise.reject(new InsightError());
@@ -131,7 +128,9 @@ export default class CourseQueryExecuteHelper {
 		let combinedDataset: Room[] = [];
 		for (let keys of innerLTStatement) {
 			let tempDataset = this.filterEachCourse(keys, curDataSet);
-			combinedDataset = [...tempDataset, ...combinedDataset]; // destructuring and combining without duplicate
+			combinedDataset = combinedDataset.concat(tempDataset);
+			combinedDataset = [...new Set([...combinedDataset, ...tempDataset])];
+			// https://codeburst.io/how-to-merge-arrays-without-duplicates-in-javascript-91c66e7b74cf
 		}
 		return combinedDataset;
 	}
@@ -247,7 +246,7 @@ export default class CourseQueryExecuteHelper {
 			return b[attribute] - a[attribute];
 		} else if (this.whereStringField.includes(attribute)) {
 			return b[attribute].localeCompare(a[attribute]);
-		}else{
+		} else{
 			return b[attribute] - a[attribute];
 		}
 	}

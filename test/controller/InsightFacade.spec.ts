@@ -183,46 +183,4 @@ describe("InsightFacade", function () {
 			}
 		);
 	});
-	describe("PerformQuery-Squidward", () => {
-
-		before(function () {
-			console.info(`Before: ${this.test?.parent?.title}`);
-			this.timeout(10000);
-
-			insightFacade = new InsightFacade();
-
-			// Load the datasets specified in datasetsToQuery and add them to InsightFacade.
-			// Will *fail* if there is a problem reading ANY dataset.
-			const loadDatasetPromises = [
-				insightFacade.addDataset("rooms", datasetContents.get("rooms") ?? "", InsightDatasetKind.Rooms),
-			];
-
-			return Promise.all(loadDatasetPromises);
-		});
-
-		after(function () {
-			console.info(`After: ${this.test?.parent?.title}`);
-			fs.removeSync(persistDir);
-		});
-
-		type PQErrorKind = "ResultTooLargeError" | "InsightError";
-		testFolder<any, any[], PQErrorKind>(
-			"Dynamic InsightFacade PerformQuery tests",
-			(input) => insightFacade.performQuery(input),
-			"./test/resources/squidward",
-			{
-				errorValidator: (error): error is PQErrorKind =>
-					error === "ResultTooLargeError" || error === "InsightError",
-				assertOnError(expected, actual) {
-					if (expected === "ResultTooLargeError") {
-						expect(actual).to.be.instanceof(ResultTooLargeError);
-					} else {
-						expect(actual).to.be.instanceof(InsightError);
-					}
-				},
-			}
-		);
-	});
-
-
 });
